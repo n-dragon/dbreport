@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christophe Lemaitre — Dossier Communication 2026</title>
+<style>
+/* ══════════════════════════════════════════
+   RESET & VARIABLES
+══════════════════════════════════════════ */
+:root {
+  --blue:   #003FBE;
+  --gold:   #C9A227;
+  --dark:   #0B0B18;
+  --darker: #060610;
+  --card:   #10101f;
+  --border: rgba(255,255,255,0.07);
+  --white:  #F8F8FF;
+  --muted:  #6B7399;
+  --red:    #CC0020;
+  --accent: #FFE033;
+  --radius: 14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--darker);
+  color: var(--white);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ══════════════════════════════════════════
+   NAV
+══════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(6,6,16,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  height: 60px;
+  display: flex; align-items: center;
+  padding: 0 32px;
+  gap: 0;
+}
+.nav-logo {
+  font-size: 20px; font-weight: 900; letter-spacing: -0.5px;
+  margin-right: 40px; flex-shrink: 0;
+}
+.nav-logo em { color: var(--gold); font-style: normal; }
+.nav-links {
+  display: flex; gap: 4px; flex: 1;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.5px; padding: 8px 16px; border-radius: 8px;
+  white-space: nowrap; transition: all 0.2s; font-family: inherit;
+}
+.nav-btn:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.nav-btn.active { color: var(--gold); background: rgba(201,162,39,0.12); }
+.nav-badge {
+  display: inline-block; background: var(--red); color: white;
+  font-size: 9px; font-weight: 700; padding: 2px 6px;
+  border-radius: 20px; margin-left: 6px; vertical-align: middle;
+  letter-spacing: 0.5px;
+}
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding: 80px 32px 60px;
+  position: relative; overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,63,190,0.18) 0%, transparent 70%);
+}
+.hero-bg-number {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(160px, 30vw, 340px);
+  font-weight: 900; letter-spacing: -10px;
+  color: rgba(201,162,39,0.05); pointer-events: none;
+  white-space: nowrap; line-height: 1;
+}
+.hero-track {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, var(--red) 0 33.3%, var(--white) 33.3% 66.6%, var(--blue) 66.6%);
+  opacity: 0.6;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.3);
+  color: var(--gold); font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  padding: 8px 20px; border-radius: 30px; margin-bottom: 32px;
+}
+.hero h1 {
+  font-size: clamp(42px, 8vw, 96px);
+  font-weight: 900; line-height: 0.95; letter-spacing: -2px;
+  margin-bottom: 16px;
+}
+.hero h1 em { color: var(--gold); font-style: normal; display: block; }
+.hero-sub {
+  font-size: clamp(14px, 2vw, 18px); color: var(--muted);
+  max-width: 560px; margin: 0 auto 40px;
+}
+.hero-stats {
+  display: flex; gap: 0; flex-wrap: wrap; justify-content: center;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 48px;
+}
+.hero-stat {
+  padding: 20px 32px; border-right: 1px solid var(--border); text-align: center;
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat strong { display: block; font-size: 28px; font-weight: 900; color: var(--gold); }
+.hero-stat span { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
+.hero-cta {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+}
+.btn-primary {
+  background: var(--gold); color: var(--darker);
+  font-size: 14px; font-weight: 700; padding: 14px 28px;
+  border-radius: 10px; cursor: pointer; transition: all 0.2s;
+  border: none; font-family: inherit;
+}
+.btn-primary:hover { background: #ddb82a; transform: translateY(-1px); }
+.btn-outline {
+  background: transparent; color: var(--white);
+  border: 1px solid var(--border); font-size: 14px; font-weight: 600;
+  padding: 14px 28px; border-radius: 10px; cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ══════════════════════════════════════════
+   SECTIONS
+══════════════════════════════════════════ */
+.section {
+  display: none; padding: 80px 32px 60px;
+  max-width: 1200px; margin: 0 auto;
+  animation: fadeIn 0.3s ease;
+}
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-header { margin-bottom: 48px; }
+.section-tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
+}
+.section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; line-height: 1.1; }
+.section-desc { margin-top: 12px; color: var(--muted); font-size: 15px; max-width: 620px; }
+
+/* ══════════════════════════════════════════
+   TENDANCES CARDS
+══════════════════════════════════════════ */
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.trend-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.trend-card:hover { border-color: rgba(201,162,39,0.4); transform: translateY(-3px); }
+.trend-icon { font-size: 36px; margin-bottom: 14px; }
+.trend-title { font-size: 15px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+.trend-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+/* ══════════════════════════════════════════
+   POSTS GRID
+══════════════════════════════════════════ */
+.posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-top: 32px; }
+.post-mock {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: border-color 0.2s;
+}
+.post-mock:hover { border-color: rgba(255,255,255,0.15); }
+.pm-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.platform-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  padding: 4px 10px; border-radius: 20px;
+}
+.badge-fb { background: #1877F2; color: white; }
+.badge-tw { background: #000; color: white; border: 1px solid #333; }
+.pm-type { font-size: 11px; color: var(--muted); }
+.pm-body { padding: 16px; }
+.pm-text { font-size: 14px; line-height: 1.6; color: #ccd0f0; }
+.pm-tags { margin-top: 10px; color: var(--blue); font-size: 13px; }
+.pm-meta {
+  margin-top: 12px; display: flex; gap: 12px;
+  font-size: 11px; color: var(--muted);
+}
+.pm-meta .pill {
+  background: rgba(255,255,255,0.05); padding: 3px 8px;
+  border-radius: 20px;
+}
+
+/* ══════════════════════════════════════════
+   YOUTUBE LIST
+══════════════════════════════════════════ */
+.yt-list { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+.yt-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px;
+  display: flex; gap: 20px; align-items: flex-start;
+  transition: border-color 0.2s;
+}
+.yt-item:hover { border-color: rgba(255,0,0,0.4); }
+.yt-item.short:hover { border-left: 3px solid #FF0000; }
+.yt-num { font-size: 28px; font-weight: 900; color: #FF0000; min-width: 48px; line-height: 1; }
+.yt-num.s { color: #FF6666; font-size: 22px; }
+.yt-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+.yt-info p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.yt-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.yt-tag {
+  font-size: 11px; padding: 2px 10px; border-radius: 20px;
+  background: rgba(255,255,255,0.06); color: var(--muted);
+}
+.yt-tag.hot { background: #FF0000; color: white; }
+.yt-tag.ev { background: rgba(201,162,39,0.2); color: var(--gold); }
+
+/* ══════════════════════════════════════════
+   LOGO SHOWCASE
+══════════════════════════════════════════ */
+.logo-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 48px; }
+.logo-box {
+  border-radius: var(--radius); padding: 40px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  transition: transform 0.2s;
+}
+.logo-box:hover { transform: translateY(-3px); }
+.logo-box.on-dark { background: #0D0D1A; border: 1px solid var(--border); }
+.logo-box.on-white { background: white; }
+.logo-box.on-blue { background: var(--blue); }
+.logo-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+.on-dark .logo-label { color: var(--muted); }
+.on-white .logo-label { color: #aaa; }
+.on-blue .logo-label { color: rgba(255,255,255,0.5); }
+
+/* ══════════════════════════════════════════
+   PALETTE
+══════════════════════════════════════════ */
+.palette-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-bottom: 48px; }
+.swatch { border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.swatch-color { height: 90px; }
+.swatch-info { background: var(--card); border: 1px solid var(--border); border-top: none; padding: 14px; }
+.swatch-name { font-size: 13px; font-weight: 700; display: block; }
+.swatch-hex { font-size: 12px; color: var(--muted); font-family: monospace; }
+.swatch-use { font-size: 11px; color: #4a5070; margin-top: 4px; display: block; }
+
+/* ══════════════════════════════════════════
+   ILLUSTRATION
+══════════════════════════════════════════ */
+.illus-zone {
+  display: flex; gap: 40px; align-items: flex-start;
+  flex-wrap: wrap; margin-bottom: 48px;
+}
+.illus-svg-wrap {
+  flex: 0 0 260px; display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+}
+.illus-desc { flex: 1; min-width: 260px; }
+.illus-desc h3 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.feature-list { list-style: none; }
+.feature-list li {
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  font-size: 14px; color: var(--muted); display: flex; gap: 10px;
+}
+.feature-list li:last-child { border-bottom: none; }
+.feature-list li::before { content: '→'; color: var(--gold); font-weight: 700; }
+.brief-box {
+  margin-top: 20px; padding: 18px 20px;
+  background: rgba(0,63,190,0.12);
+  border: 1px solid rgba(0,63,190,0.3);
+  border-radius: 10px;
+}
+.brief-box strong { color: var(--blue); font-size: 13px; }
+.brief-box p { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+/* ══════════════════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════════════════ */
+.typo-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 36px;
+  margin-bottom: 48px;
+}
+.typo-t1 { font-size: clamp(32px, 5vw, 56px); font-weight: 900; letter-spacing: -1px; line-height: 1; }
+.typo-t2 { font-size: 22px; font-weight: 700; color: var(--blue); margin-top: 12px; }
+.typo-t3 { font-size: 15px; color: var(--muted); margin-top: 8px; line-height: 1.7; max-width: 600px; }
+.typo-t4 { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-top: 12px; font-weight: 700; }
+
+/* ══════════════════════════════════════════
+   PLAQUETTE
+══════════════════════════════════════════ */
+.plaquette {
+  background: var(--dark);
+  border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  max-width: 860px; margin: 0 auto;
+}
+.plq-header {
+  display: flex; align-items: stretch;
+  border-bottom: 3px solid var(--gold);
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #0a0a20 0%, #001266 60%, var(--blue) 100%);
+}
+.plq-flag { display: flex; flex-direction: column; width: 8px; flex-shrink: 0; }
+.plq-flag-blue { background: var(--blue); flex: 1; }
+.plq-flag-white { background: var(--white); flex: 1; }
+.plq-flag-red { background: var(--red); flex: 1; }
+.plq-head-content { padding: 44px 40px 36px; flex: 1; }
+.plq-pretitle { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.plq-name { font-size: clamp(32px, 5vw, 52px); font-weight: 900; line-height: 0.95; letter-spacing: -1px; }
+.plq-name em { color: var(--gold); font-style: normal; }
+.plq-role { margin-top: 10px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(248,248,255,0.5); }
+.plq-bg-num {
+  position: absolute; right: 160px; top: 10px;
+  font-size: 140px; font-weight: 900; color: rgba(201,162,39,0.06);
+  letter-spacing: -5px; pointer-events: none;
+}
+.plq-logo-wrap {
+  padding: 36px 40px; display: flex; align-items: center; justify-content: center;
+}
+.plq-stats {
+  display: flex; border-bottom: 1px solid var(--border);
+}
+.plq-stat { flex: 1; text-align: center; padding: 22px 12px; border-right: 1px solid var(--border); }
+.plq-stat:last-child { border-right: none; }
+.plq-stat strong { display: block; font-size: 26px; font-weight: 900; color: var(--gold); }
+.plq-stat span { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.plq-body { display: grid; grid-template-columns: 1fr 1fr; }
+.plq-col { padding: 32px 36px; }
+.plq-col:first-child { border-right: 1px solid var(--border); }
+.plq-col-title { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(201,162,39,0.25); }
+.timeline { list-style: none; }
+.tl-item { display: flex; gap: 12px; margin-bottom: 16px; }
+.tl-year { font-size: 11px; font-weight: 700; color: var(--gold); min-width: 36px; padding-top: 2px; }
+.tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); border: 2px solid var(--gold); margin-top: 4px; flex-shrink: 0; }
+.tl-text strong { display: block; font-size: 13px; font-weight: 700; }
+.tl-text span { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.svc-list { list-style: none; }
+.svc-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.svc-item:last-child { border-bottom: none; }
+.svc-icon { font-size: 18px; min-width: 24px; }
+.svc-text strong { display: block; font-size: 13px; }
+.svc-text small { color: var(--muted); font-size: 11px; }
+.plq-quote {
+  margin: 0 36px 28px; padding: 24px 28px;
+  background: rgba(0,63,190,0.12);
+  border-left: 4px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+}
+.plq-quote blockquote { font-size: 16px; font-style: italic; line-height: 1.6; }
+.plq-quote cite { display: block; margin-top: 10px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-style: normal; }
+.plq-social { display: flex; gap: 10px; padding: 0 36px 28px; flex-wrap: wrap; }
+.social-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 30px; padding: 8px 16px; font-size: 12px; font-weight: 600;
+  flex: 1; min-width: 160px; justify-content: center;
+}
+.s-dot { width: 8px; height: 8px; border-radius: 50%; }
+.plq-footer {
+  display: flex; align-items: center; padding: 18px 36px;
+  border-top: 1px solid var(--border);
+}
+.plq-footer-logo { font-size: 20px; font-weight: 900; }
+.plq-footer-logo em { color: var(--gold); font-style: normal; }
+.plq-bars { display: flex; gap: 3px; margin-left: 16px; }
+.plq-bar { width: 5px; border-radius: 3px; }
+.plq-footer-contact { margin-left: auto; text-align: right; font-size: 11px; color: var(--muted); line-height: 1.8; }
+
+/* ══════════════════════════════════════════
+   APPS GRID
+══════════════════════════════════════════ */
+.apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-top: 36px; }
+.app-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px 20px; text-align: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.app-card:hover { border-color: rgba(201,162,39,0.3); transform: translateY(-2px); }
+.app-icon { font-size: 32px; margin-bottom: 10px; }
+.app-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.app-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+/* ══════════════════════════════════════════
+   DIVIDER
+══════════════════════════════════════════ */
+.divider {
+  height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 48px 0;
+}
+.subsection-title {
+  font-size: 18px; font-weight: 700; margin-bottom: 24px; color: var(--white);
+  display: flex; align-items: center; gap: 10px;
+}
+.subsection-title::before {
+  content: ''; display: block; width: 4px; height: 20px;
+  background: var(--gold); border-radius: 2px;
+}
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+footer {
+  background: var(--darker); border-top: 1px solid var(--border);
+  padding: 32px; text-align: center; color: var(--muted); font-size: 12px;
+}
+footer a { color: var(--gold); }
+footer .footer-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+footer .footer-links a:hover { color: var(--white); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 640px) {
+  nav { padding: 0 16px; }
+  .nav-logo { margin-right: 16px; }
+  .section { padding: 72px 16px 40px; }
+  .plq-body { grid-template-columns: 1fr; }
+  .plq-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  .hero-stat { padding: 16px 20px; }
+  .illus-svg-wrap { flex: 0 0 220px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     NAV
+════════════════════════════════════════ -->
+<nav>
+  <div class="nav-logo">CL<em>·</em>992</div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="show('hero')">Accueil</button>
+    <button class="nav-btn" onclick="show('tendances')">Tendances <span class="nav-badge">2026</span></button>
+    <button class="nav-btn" onclick="show('facebook')">Facebook</button>
+    <button class="nav-btn" onclick="show('twitter')">Twitter / X</button>
+    <button class="nav-btn" onclick="show('youtube')">YouTube</button>
+    <button class="nav-btn" onclick="show('identite')">Identité visuelle</button>
+    <button class="nav-btn" onclick="show('plaquette')">Plaquette</button>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<div id="hero" class="section active" style="max-width:100%; padding-top:0;">
+  <div class="hero">
+    <div class="hero-bg-number">9.92</div>
+    <div class="hero-tag">
+      <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#C9A227"/></svg>
+      Dossier Communication Digitale 2026
+    </div>
+    <h1>CHRISTOPHE<em>LEMAITRE</em></h1>
+    <p class="hero-sub">Stratégie de communication complète pour l'ancien sprinter olympique, médaillé de bronze à Rio 2016 et premier Européen blanc sous les 10 secondes.</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat"><strong>9"92</strong><span>Record 100m</span></div>
+      <div class="hero-stat"><strong>3×</strong><span>Champion d'Europe</span></div>
+      <div class="hero-stat"><strong>🥉</strong><span>Bronze JO Rio</span></div>
+      <div class="hero-stat"><strong>1er</strong><span>Blanc sous 10"</span></div>
+      <div class="hero-stat"><strong>2026</strong><span>Nouvelle carrière</span></div>
+    </div>
+
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="show('tendances')">Voir la stratégie</button>
+      <button class="btn-outline" onclick="show('plaquette')">Consulter la plaquette</button>
+    </div>
+
+    <div class="hero-track"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TENDANCES
+════════════════════════════════════════ -->
+<div id="tendances" class="section">
+  <div class="section-header">
+    <div class="section-tag">01 · Analyse</div>
+    <h2 class="section-title">Tendances YouTube & Réseaux 2026</h2>
+    <p class="section-desc">Les algorithmes en 2026 récompensent l'authenticité, la régularité et la narration personnelle. 6 tendances clés à exploiter pour un athlète reconverti.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="trend-card">
+      <div class="trend-icon">🎬</div>
+      <div class="trend-title">Shorts + Long format hybride</div>
+      <div class="trend-desc">Les chaînes combinant Shorts viraux (&lt;60s) et vidéos narratives (10–20 min) dominent l'algorithme. Le Short ramène l'audience, le long format fidélise.</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-icon">🎙️</div>
+      <div class="trend-title">Authenticité brute</div>
+      <div class="trend-desc">Le sur-produit est mort. Les audiences veulent du vrai : doutes, coulisses, échecs, joies non scénarisées. Les formats "caméra à l'épaule" explosent les vues.</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-icon">🏋️</div>
+      <div class="trend-title">Athlète = Média autonome</div>
+      <div class="trend-desc">Les anciens champions partageant leur reconversion créent des communautés ultra-engagées. Le fan veut l'accès backstage, pas seulement la performance.</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-icon">🧠</div>
+      <div class="trend-title">Mental & performance</div>
+      <div class="trend-desc">Le contenu sur la psychologie du sportif est en forte croissance. Gérer la pression, l'après-carrière, la motivation : des sujets universels qui touchent tous les publics.</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-icon">🤝</div>
+      <div class="trend-title">Collabs & challenges</div>
+      <div class="trend-desc">Les collaborations avec d'autres athlètes ou influenceurs sport (défis de vitesse, tests physiques) génèrent des pics de visibilité et de nouveaux abonnés.</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-icon">📚</div>
+      <div class="trend-title">Contenu éducatif fitness</div>
+      <div class="trend-desc">Les formats "Je t'apprends à courir plus vite" ou "Programme de sprint 30 jours" captent une audience large et positionnent l'athlète comme expert de référence.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     FACEBOOK
+════════════════════════════════════════ -->
+<div id="facebook" class="section">
+  <div class="section-header">
+    <div class="section-tag">02 · Facebook</div>
+    <h2 class="section-title">Idées de posts Facebook</h2>
+    <p class="section-desc">6 posts calibrés pour maximiser l'engagement — mix de storytelling, nostalgie, coaching et interaction communautaire.</p>
+  </div>
+
+  <div class="posts-grid">
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-fb">Facebook</span><span class="pm-type">Storytelling · Carrousel photo</span></div>
+      <div class="pm-body">
+        <p class="pm-text">🏆 <strong>2010. Berlin. 19 ans.</strong><br>Ce soir-là, je suis devenu le premier Européen blanc à passer sous les 10 secondes. Mais ce que vous ne savez pas, c'est ce qui s'est passé 10 minutes avant la course...</p>
+        <p class="pm-tags">#Lemaitre #Sprint #AthlétismeFrancais</p>
+        <div class="pm-meta"><span class="pill">📸 Carrousel 5 photos</span><span class="pill">🎯 Nostalgie</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-fb">Facebook</span><span class="pm-type">Coaching · Vidéo courte</span></div>
+      <div class="pm-body">
+        <p class="pm-text">💨 <strong>La technique qui m'a permis de courir le 100m en 9"92.</strong><br>Aujourd'hui je la transmets à mes élèves à Metz. 30 secondes pour comprendre comment placer votre foulée. ▶️</p>
+        <p class="pm-tags">#CoachingFitness #Sprint #Technique</p>
+        <div class="pm-meta"><span class="pill">📹 Vidéo 30s</span><span class="pill">🎯 Expertise</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-fb">Facebook</span><span class="pm-type">Community · Question</span></div>
+      <div class="pm-body">
+        <p class="pm-text">🙋 <strong>Question à ma communauté :</strong><br>Vous vous souvenez de quel moment de ma carrière ? Rio 2016 🥉, Berlin 2010 🏆, ou autre chose ? Dites-moi en commentaire, ça m'intéresse vraiment !</p>
+        <p class="pm-tags">#Memories #Athlétisme #JO2016</p>
+        <div class="pm-meta"><span class="pill">💬 Question ouverte</span><span class="pill">🎯 Commentaires</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-fb">Facebook</span><span class="pm-type">Reconversion · Témoignage</span></div>
+      <div class="pm-body">
+        <p class="pm-text">🔄 <strong>De l'Olympisme aux salles de Moselle.</strong><br>Passer de la piste olympique au coaching fitness, ce n'était pas évident. Je vous raconte ma reconversion sans filtres. Ce que j'ai perdu. Ce que j'ai gagné.</p>
+        <p class="pm-tags">#Reconversion #AprèsSport #MentalAthlète</p>
+        <div class="pm-meta"><span class="pill">📝 Long texte</span><span class="pill">🎯 Authenticité</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-fb">Facebook</span><span class="pm-type">Challenge · Viral</span></div>
+      <div class="pm-body">
+        <p class="pm-text">⚡ <strong>#992Challenge</strong><br>Je défie 3 personnes de ma communauté à venir courir avec moi sur la piste. Taguez quelqu'un qui pense être rapide ! Le meilleur gagne une session coaching privée. 🏃</p>
+        <p class="pm-tags">#992Challenge #Sprint #Défi</p>
+        <div class="pm-meta"><span class="pill">🏆 Challenge viral</span><span class="pill">🎯 Tags</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-fb">Facebook</span><span class="pm-type">Coulisses · Behind the scenes</span></div>
+      <div class="pm-body">
+        <p class="pm-text">📸 <strong>Mon quotidien de coach à Metz.</strong><br>6h du matin. Les premières arrivées. Le café qui refroidit. Une salle qui sent le sport et la détermination. Je n'échangerai ça pour rien au monde.</p>
+        <p class="pm-tags">#CoachVie #Metz #Moselle #Fitness</p>
+        <div class="pm-meta"><span class="pill">📸 Photo authentique</span><span class="pill">🎯 Proximité</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TWITTER
+════════════════════════════════════════ -->
+<div id="twitter" class="section">
+  <div class="section-header">
+    <div class="section-tag">03 · Twitter / X</div>
+    <h2 class="section-title">Idées de posts Twitter / X</h2>
+    <p class="section-desc">Format court, impact immédiat. Punchlines, débats et valeur ajoutée — le format X qui performe en 2026.</p>
+  </div>
+
+  <div class="posts-grid">
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-tw">Twitter / X</span><span class="pm-type">Punchline · Citation</span></div>
+      <div class="pm-body">
+        <p class="pm-text">"9 secondes et 92 centièmes.<br>Une vie entière pour ça.<br>Et chaque matin je recommence à courir.<br>Pas sur une piste. Vers quelque chose de nouveau." ⚡</p>
+        <p class="pm-tags">#Sprint #AthlétismeFR #Reconversion</p>
+        <div class="pm-meta"><span class="pill">✍️ Texte seul</span><span class="pill">🎯 Partage</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-tw">Twitter / X</span><span class="pm-type">Thread · Valeur</span></div>
+      <div class="pm-body">
+        <p class="pm-text">🧵 <strong>Thread : 7 choses que le sprint m'a apprises sur la vie.</strong><br>1/ La préparation compte 10× plus que la performance le jour J.<br>2/ Votre vrai concurrent, c'est vous de hier.<br>[suite du thread...]</p>
+        <p class="pm-tags">#Performance #MindsetAthlète #Thread</p>
+        <div class="pm-meta"><span class="pill">🧵 Thread 7 tweets</span><span class="pill">🎯 Impressions</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-tw">Twitter / X</span><span class="pm-type">Expert · Réaction</span></div>
+      <div class="pm-body">
+        <p class="pm-text">Ce 100m que je viens de voir… la technique de départ est parfaite mais la phase de décélération fait tout perdre. Le sprint se joue autant dans les 40 derniers mètres. Voici pourquoi 👇</p>
+        <p class="pm-tags">#Athlétisme #Analyse #Sprint</p>
+        <div class="pm-meta"><span class="pill">📺 Réaction live</span><span class="pill">🎯 Expert</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-tw">Twitter / X</span><span class="pm-type">Humour · Quotidien</span></div>
+      <div class="pm-body">
+        <p class="pm-text">Mes élèves ce matin :<br>"Coach, vous courez encore ?"<br>Moi : "J'arrive à 8h en étant parti à 8h01."<br><br>Certains talents ne disparaissent jamais. ⚡</p>
+        <p class="pm-tags">#CoachLife #Sprinter #Humour</p>
+        <div class="pm-meta"><span class="pill">😄 Humour relatable</span><span class="pill">🎯 RT</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-tw">Twitter / X</span><span class="pm-type">Sondage · Engagement</span></div>
+      <div class="pm-body">
+        <p class="pm-text">🗳️ Débat sport :<br>Qu'est-ce qui fait un grand sprinter ?<br>🔵 Les jambes (génétique)<br>🟡 La tête (mental)<br>🔴 La technique (travail)<br>⚪ Le tout ensemble</p>
+        <p class="pm-tags">#Sprint #Débat #Sport</p>
+        <div class="pm-meta"><span class="pill">📊 Sondage 48h</span><span class="pill">🎯 Engagement max</span></div>
+      </div>
+    </div>
+
+    <div class="post-mock">
+      <div class="pm-header"><span class="platform-badge badge-tw">Twitter / X</span><span class="pm-type">Mindset · Inspiration</span></div>
+      <div class="pm-body">
+        <p class="pm-text">"Je n'ai jamais perdu une course.<br>J'ai juste parfois terminé deuxième."<br><br>Le mindset qui m'a permis de rebondir après chaque défaite. 🥇</p>
+        <p class="pm-tags">#Mindset #Champion #AthlétismeFR</p>
+        <div class="pm-meta"><span class="pill">💬 Citation</span><span class="pill">🎯 RP · Likes</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     YOUTUBE
+════════════════════════════════════════ -->
+<div id="youtube" class="section">
+  <div class="section-header">
+    <div class="section-tag">04 · YouTube</div>
+    <h2 class="section-title">Idées de vidéos YouTube</h2>
+    <p class="section-desc">13 concepts pensés pour l'algorithme 2026 — Shorts viraux, vlogs authentiques, formats éducatifs evergreen. Objectif : 10K abonnés en 6 mois.</p>
+  </div>
+
+  <div class="subsection-title">Vidéos longues</div>
+  <div class="yt-list">
+    <div class="yt-item">
+      <div class="yt-num">01</div>
+      <div class="yt-info">
+        <h4>J'ai recouru le 100m à 35 ans — voici mon chrono</h4>
+        <p>Retour sur piste après la retraite, préparation en 2 semaines, course avec chronomètre officiel. Émotion garantie, format défi personnel très viral.</p>
+        <div class="yt-tags"><span class="yt-tag hot">VIRAL</span><span class="yt-tag">Défi</span><span class="yt-tag">Nostalgie</span><span class="yt-tag">15 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">02</div>
+      <div class="yt-info">
+        <h4>La vérité sur ma médaille de bronze à Rio (ce qu'on ne vous a jamais dit)</h4>
+        <p>Coulisses des JO 2016, la pression, la course dans sa tête. Le "derrière le podium" que personne ne connaît. Confession + images d'archives.</p>
+        <div class="yt-tags"><span class="yt-tag hot">TRENDING</span><span class="yt-tag">Storytelling</span><span class="yt-tag">JO</span><span class="yt-tag">20 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">03</div>
+      <div class="yt-info">
+        <h4>Je coache un débutant complet pendant 30 jours — transformation totale</h4>
+        <p>Série en 4 épisodes. Un abonné sélectionné, objectif courir le 100m en moins de 14s. Suivi quotidien, technique, nutrition, mental.</p>
+        <div class="yt-tags"><span class="yt-tag hot">SÉRIE</span><span class="yt-tag">Coaching</span><span class="yt-tag">Transformation</span><span class="yt-tag">4×15min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">04</div>
+      <div class="yt-info">
+        <h4>J'analyse la technique des 10 sprinters les plus rapides de l'histoire</h4>
+        <p>Analyse vidéo technique avec écran partagé. Position des bras, fréquence de foulée, phase de départ. Contenu expert qui attire fitness + sport.</p>
+        <div class="yt-tags"><span class="yt-tag ev">EVERGREEN</span><span class="yt-tag">Analyse</span><span class="yt-tag">SEO fort</span><span class="yt-tag">18 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">05</div>
+      <div class="yt-info">
+        <h4>Ma journée type de coach fitness à Metz (6h–22h)</h4>
+        <p>Vlog quotidien authentique. Réveil, salle de sport, cours, préparation, famille. Le format "day in the life" est le top-performer absolu en 2026.</p>
+        <div class="yt-tags"><span class="yt-tag hot">TRENDING</span><span class="yt-tag">Vlog</span><span class="yt-tag">Lifestyle</span><span class="yt-tag">12 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">06</div>
+      <div class="yt-info">
+        <h4>3 erreurs que font 99% des coureurs (et comment les corriger)</h4>
+        <p>Éducatif rapide avec démonstrations sur piste. Très fort SEO sur YouTube, attire les coureurs amateurs du monde entier.</p>
+        <div class="yt-tags"><span class="yt-tag ev">EVERGREEN</span><span class="yt-tag">Tips</span><span class="yt-tag">Running</span><span class="yt-tag">8 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">07</div>
+      <div class="yt-info">
+        <h4>Ce que les Jeux Olympiques font vraiment à un athlète (ma vérité)</h4>
+        <p>Confession face caméra. Solitude, pression familiale, identité post-carrière. Sujet tabou = engagement maximal et commentaires nourris.</p>
+        <div class="yt-tags"><span class="yt-tag hot">VIRAL</span><span class="yt-tag">Mental</span><span class="yt-tag">Santé</span><span class="yt-tag">20 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">08</div>
+      <div class="yt-info">
+        <h4>Programme sprint 4 semaines pour courir plus vite (niveau débutant)</h4>
+        <p>Tutoriel structuré semaine par semaine, exercices filmés, explications techniques. Contenu evergreen qui génère des vues sur le long terme.</p>
+        <div class="yt-tags"><span class="yt-tag ev">EVERGREEN</span><span class="yt-tag">Programme</span><span class="yt-tag">Fitness</span><span class="yt-tag">25 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">09</div>
+      <div class="yt-info">
+        <h4>J'affronte le champion régional de sprint de Moselle</h4>
+        <p>Défi collab. Trouver un jeune sprinteur local, confrontation amicale sur 60m et 100m, conseils techniques. Génère presse locale + viralité.</p>
+        <div class="yt-tags"><span class="yt-tag">Collab</span><span class="yt-tag">Défi</span><span class="yt-tag">Région</span><span class="yt-tag">10 min</span></div>
+      </div>
+    </div>
+    <div class="yt-item">
+      <div class="yt-num">10</div>
+      <div class="yt-info">
+        <h4>Je mange comme un sprinter olympique pendant une semaine</h4>
+        <p>Challenge nutrition. Régime exact d'un sprinter de haut niveau : quantités, timing, suppléments. Collab possible avec un nutritionniste sportif.</p>
+        <div class="yt-tags"><span class="yt-tag">Nutrition</span><span class="yt-tag">Challenge</span><span class="yt-tag">12 min</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="subsection-title">YouTube Shorts</div>
+  <div class="yt-list">
+    <div class="yt-item short" style="border-left: 3px solid #FF0000;">
+      <div class="yt-num s">S1</div>
+      <div class="yt-info">
+        <h4>Ma réaction quand quelqu'un pense être plus rapide que moi</h4>
+        <p>Short &lt;60s humoristique. Défi improvisé filmé à la salle, réaction authentique. Potentiel de viralité maximale.</p>
+        <div class="yt-tags"><span class="yt-tag hot">SHORTS</span><span class="yt-tag">Humour</span><span class="yt-tag">&lt;60s</span></div>
+      </div>
+    </div>
+    <div class="yt-item short" style="border-left: 3px solid #FF0000;">
+      <div class="yt-num s">S2</div>
+      <div class="yt-info">
+        <h4>La vérité sur le chrono 9"92 (ce qu'on ne montre jamais)</h4>
+        <p>Short &lt;45s révélation. Un fait méconnu sur le record, caméra face, ton direct. Hook fort dès la première seconde.</p>
+        <div class="yt-tags"><span class="yt-tag hot">SHORTS</span><span class="yt-tag">Record</span><span class="yt-tag">&lt;45s</span></div>
+      </div>
+    </div>
+    <div class="yt-item short" style="border-left: 3px solid #FF0000;">
+      <div class="yt-num s">S3</div>
+      <div class="yt-info">
+        <h4>Je chronomètre des inconnus dans la rue</h4>
+        <p>Caméra cachée / rue. Un sprinter olympique sort un chrono dans la rue et chronomètre des passants. Street challenge très performant en 2026.</p>
+        <div class="yt-tags"><span class="yt-tag hot">SHORTS VIRAL</span><span class="yt-tag">Street</span><span class="yt-tag">&lt;60s</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     IDENTITÉ VISUELLE
+════════════════════════════════════════ -->
+<div id="identite" class="section">
+  <div class="section-header">
+    <div class="section-tag">05 · Identité visuelle</div>
+    <h2 class="section-title">Charte graphique</h2>
+    <p class="section-desc">Logo, palette, typographie et illustration officielle — une identité construite autour de la vitesse, de la France et du champion.</p>
+  </div>
+
+  <!-- LOGO -->
+  <div class="subsection-title">Logo — 3 déclinaisons</div>
+  <div class="logo-row">
+    <div class="logo-box on-dark">
+      <svg width="260" height="88" viewBox="0 0 260 88" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="72" width="260" height="3" fill="#C9A227" opacity="0.3"/>
+        <text x="8" y="68" font-family="Arial Black,sans-serif" font-size="64" font-weight="900" fill="#F8F8FF" letter-spacing="-4">CL</text>
+        <polygon points="95,10 85,42 93,42 80,72 102,35 93,35 106,10" fill="#C9A227"/>
+        <text x="115" y="36" font-family="Arial,sans-serif" font-size="28" font-weight="900" fill="#F8F8FF">9.92</text>
+        <text x="115" y="55" font-family="Arial,sans-serif" font-size="11" fill="#C9A227" letter-spacing="3">SPRINTER · COACH</text>
+        <rect x="0" y="78" width="260" height="1" fill="#003FBE" opacity="0.5"/>
+        <rect x="0" y="83" width="260" height="1" fill="#003FBE" opacity="0.3"/>
+      </svg>
+      <span class="logo-label">Version sombre</span>
+    </div>
+    <div class="logo-box on-white">
+      <svg width="260" height="88" viewBox="0 0 260 88" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="72" width="260" height="3" fill="#C9A227" opacity="0.4"/>
+        <text x="8" y="68" font-family="Arial Black,sans-serif" font-size="64" font-weight="900" fill="#0D0D1A" letter-spacing="-4">CL</text>
+        <polygon points="95,10 85,42 93,42 80,72 102,35 93,35 106,10" fill="#C9A227"/>
+        <text x="115" y="36" font-family="Arial,sans-serif" font-size="28" font-weight="900" fill="#003FBE">9.92</text>
+        <text x="115" y="55" font-family="Arial,sans-serif" font-size="11" fill="#C9A227" letter-spacing="3">SPRINTER · COACH</text>
+        <rect x="0" y="78" width="260" height="1" fill="#003FBE" opacity="0.3"/>
+      </svg>
+      <span class="logo-label">Version claire</span>
+    </div>
+    <div class="logo-box on-blue">
+      <svg width="260" height="88" viewBox="0 0 260 88" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="72" width="260" height="3" fill="#FFE033" opacity="0.6"/>
+        <text x="8" y="68" font-family="Arial Black,sans-serif" font-size="64" font-weight="900" fill="#FFFFFF" letter-spacing="-4">CL</text>
+        <polygon points="95,10 85,42 93,42 80,72 102,35 93,35 106,10" fill="#FFE033"/>
+        <text x="115" y="36" font-family="Arial,sans-serif" font-size="28" font-weight="900" fill="#FFFFFF">9.92</text>
+        <text x="115" y="55" font-family="Arial,sans-serif" font-size="11" fill="#FFE033" letter-spacing="3">SPRINTER · COACH</text>
+      </svg>
+      <span class="logo-label">Version bleue</span>
+    </div>
+  </div>
+
+  <!-- PALETTE -->
+  <div class="subsection-title">Palette de couleurs</div>
+  <div class="palette-row">
+    <div class="swatch"><div class="swatch-color" style="background:#0D0D1A;"></div><div class="swatch-info"><span class="swatch-name">Noir Champion</span><span class="swatch-hex">#0D0D1A</span><span class="swatch-use">Fond · typo</span></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#003FBE;"></div><div class="swatch-info"><span class="swatch-name">Bleu France</span><span class="swatch-hex">#003FBE</span><span class="swatch-use">Couleur dominante</span></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#C9A227;"></div><div class="swatch-info"><span class="swatch-name">Or Olympique</span><span class="swatch-hex">#C9A227</span><span class="swatch-use">Logo · accent</span></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#CC0020;"></div><div class="swatch-info"><span class="swatch-name">Rouge Victoire</span><span class="swatch-hex">#CC0020</span><span class="swatch-use">CTA · urgence</span></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#FFE033;"></div><div class="swatch-info"><span class="swatch-name">Jaune Sprint</span><span class="swatch-hex">#FFE033</span><span class="swatch-use">Éclairs · mise en valeur</span></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#F8F8FF; border:1px solid #333;"></div><div class="swatch-info"><span class="swatch-name">Blanc Pur</span><span class="swatch-hex">#F8F8FF</span><span class="swatch-use">Texte sur sombre</span></div></div>
+  </div>
+
+  <!-- TYPO -->
+  <div class="subsection-title">Typographie</div>
+  <div class="typo-card">
+    <div class="typo-t4">Titre principal · Arial Black / Poids 900</div>
+    <div class="typo-t1">CHRISTOPHE LEMAITRE</div>
+    <div class="typo-t2">Sous-titre — Arial Bold / Poids 700</div>
+    <div class="typo-t3">Corps de texte — Segoe UI Regular / 14–16px · Interligne 1.6. Lisibilité optimale sur tous les supports numériques et print. Couleur #555 sur fond clair, #9ba8d4 sur fond sombre.</div>
+    <div class="typo-t4">MENTION / LABEL · 11px · Espacement lettres +3px · Majuscules</div>
+  </div>
+
+  <!-- ILLUSTRATION -->
+  <div class="subsection-title">Illustration officielle du sportif</div>
+  <div class="illus-zone">
+    <div class="illus-svg-wrap">
+      <svg width="220" height="320" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="150" r="140" fill="#EEF2FF" opacity="0.08"/>
+        <circle cx="100" cy="150" r="130" fill="none" stroke="#003FBE" stroke-width="2" opacity="0.2"/>
+        <rect x="10" y="265" width="180" height="4" rx="2" fill="#C9A227" opacity="0.7"/>
+        <rect x="10" y="272" width="180" height="2" rx="1" fill="#003FBE" opacity="0.5"/>
+        <ellipse cx="105" cy="268" rx="35" ry="5" fill="#003FBE" opacity="0.2"/>
+        <line x1="95" y1="210" x2="72" y2="262" stroke="#1a1a3a" stroke-width="10" stroke-linecap="round"/>
+        <rect x="66" y="258" width="18" height="8" rx="4" fill="#CC0020"/>
+        <line x1="95" y1="210" x2="118" y2="250" stroke="#1a1a3a" stroke-width="10" stroke-linecap="round"/>
+        <line x1="118" y1="250" x2="138" y2="262" stroke="#1a1a3a" stroke-width="9" stroke-linecap="round"/>
+        <rect x="130" y="258" width="18" height="8" rx="4" fill="#CC0020"/>
+        <rect x="80" y="155" width="35" height="58" rx="10" fill="#003FBE"/>
+        <rect x="85" y="163" width="25" height="20" rx="3" fill="white"/>
+        <text x="97" y="178" font-family="Arial Black" font-size="11" font-weight="900" fill="#003FBE" text-anchor="middle">9</text>
+        <line x1="80" y1="168" x2="57" y2="195" stroke="#1a1a3a" stroke-width="9" stroke-linecap="round"/>
+        <line x1="57" y1="195" x2="48" y2="175" stroke="#1a1a3a" stroke-width="8" stroke-linecap="round"/>
+        <line x1="115" y1="168" x2="138" y2="148" stroke="#1a1a3a" stroke-width="9" stroke-linecap="round"/>
+        <line x1="138" y1="148" x2="148" y2="165" stroke="#1a1a3a" stroke-width="8" stroke-linecap="round"/>
+        <rect x="91" y="140" width="16" height="18" rx="5" fill="#D4A574"/>
+        <circle cx="99" cy="128" r="22" fill="#D4A574"/>
+        <ellipse cx="99" cy="110" rx="21" ry="10" fill="#3a2a1a"/>
+        <rect x="78" y="108" width="42" height="8" rx="4" fill="#3a2a1a"/>
+        <circle cx="91" cy="128" r="2.5" fill="#1a0a0a"/>
+        <circle cx="107" cy="128" r="2.5" fill="#1a0a0a"/>
+        <path d="M90 138 Q99 143 109 138" stroke="#1a0a0a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <polygon points="155,80 142,110 152,110 136,140 163,105 152,105 168,80" fill="#FFE033" opacity="0.9"/>
+        <line x1="30" y1="170" x2="55" y2="170" stroke="#C9A227" stroke-width="2" opacity="0.7"/>
+        <line x1="25" y1="178" x2="52" y2="178" stroke="#C9A227" stroke-width="1.5" opacity="0.5"/>
+        <line x1="32" y1="186" x2="50" y2="186" stroke="#C9A227" stroke-width="1" opacity="0.3"/>
+        <text x="100" y="293" font-family="Arial Black" font-size="11" font-weight="900" fill="#003FBE" text-anchor="middle" letter-spacing="3">CHRISTOPHE</text>
+      </svg>
+      <div style="font-size:11px; color:var(--muted); text-align:center;">Flat design vectoriel<br>Pose de sprint · dossard n°9</div>
+    </div>
+    <div class="illus-desc">
+      <h3>Concept illustration officielle</h3>
+      <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:20px;">Style <strong style="color:var(--white)">flat design vectoriel</strong> : épuré, moderne, adaptable à tous les formats. La pose de mi-foulée symbolise l'identité de Christophe et se décline facilement en avatar, thumbnail YouTube, sticker ou merch.</p>
+      <ul class="feature-list">
+        <li>Pose sprint authentique (mi-foulée dynamique)</li>
+        <li>Dossard numéro 9 — référence au record 9"92</li>
+        <li>Chaussures rouge France (tricolore discret)</li>
+        <li>Éclair jaune = vitesse, énergie, caractère</li>
+        <li>Lignes de piste en or sous les pieds</li>
+        <li>Palette bleu/or/rouge — France + Champion</li>
+        <li>Version "coach" déclinable avec clipboard</li>
+      </ul>
+      <div class="brief-box">
+        <strong>Brief illustrateur professionnel :</strong>
+        <p>Style : flat design vectoriel · Réf : branding Nike custom art · Livrables : SVG + PNG HD + fond transparent · Formats : carré 1:1, vertical 9:16, horizontal 16:9</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATIONS -->
+  <div class="subsection-title">Applications de la charte</div>
+  <div class="apps-grid">
+    <div class="app-card"><div class="app-icon">📱</div><div class="app-title">Profil réseaux</div><div class="app-desc">Logo CL + fond bleu<br>1080×1080px</div></div>
+    <div class="app-card"><div class="app-icon">🎬</div><div class="app-title">Bannière YouTube</div><div class="app-desc">Fond sombre + illustration<br>2560×1440px</div></div>
+    <div class="app-card"><div class="app-icon">🖼️</div><div class="app-title">Miniature vidéo</div><div class="app-desc">Template Canva<br>1280×720px</div></div>
+    <div class="app-card"><div class="app-icon">👕</div><div class="app-title">Merch / Goodies</div><div class="app-desc">T-shirt, casquette<br>Logo + 9.92</div></div>
+    <div class="app-card"><div class="app-icon">📧</div><div class="app-title">Signature email</div><div class="app-desc">Logo + coordonnées<br>Format HTML</div></div>
+    <div class="app-card"><div class="app-icon">🎴</div><div class="app-title">Carte de visite</div><div class="app-desc">Recto : portrait<br>Verso : contacts</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PLAQUETTE
+════════════════════════════════════════ -->
+<div id="plaquette" class="section">
+  <div class="section-header">
+    <div class="section-tag">06 · Plaquette</div>
+    <h2 class="section-title">Plaquette de présentation</h2>
+    <p class="section-desc">Document de présentation officiel pour partenariats, sponsors et prises de contact professionnelles.</p>
+  </div>
+
+  <div class="plaquette">
+    <!-- HEADER -->
+    <div class="plq-header">
+      <div class="plq-flag"><div class="plq-flag-blue"></div><div class="plq-flag-white"></div><div class="plq-flag-red"></div></div>
+      <div class="plq-head-content">
+        <div class="plq-bg-num">9.92</div>
+        <div class="plq-pretitle">Dossier de présentation · Agent Comm Sport 2026</div>
+        <div class="plq-name">CHRISTOPHE<br><em>LEMAITRE</em></div>
+        <div class="plq-role">Sprinter olympique · Champion d'Europe · Coach Fitness</div>
+      </div>
+      <div class="plq-logo-wrap">
+        <svg width="120" height="120" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="65" cy="65" r="63" fill="rgba(0,63,190,0.15)" stroke="#C9A227" stroke-width="1.5"/>
+          <text x="12" y="82" font-family="Arial Black,sans-serif" font-size="56" font-weight="900" fill="#F8F8FF" letter-spacing="-3">CL</text>
+          <polygon points="82,22 74,46 80,46 70,72 90,44 83,44 94,22" fill="#C9A227" opacity="0.9"/>
+          <text x="65" y="115" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#C9A227" text-anchor="middle" letter-spacing="2">9 · 9 2</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="plq-stats">
+      <div class="plq-stat"><strong>9"92</strong><span>Record 100m</span></div>
+      <div class="plq-stat"><strong>3×</strong><span>Champion d'Europe</span></div>
+      <div class="plq-stat"><strong>🥉</strong><span>Bronze JO Rio 2016</span></div>
+      <div class="plq-stat"><strong>14</strong><span>Ans de carrière</span></div>
+      <div class="plq-stat"><strong>1er</strong><span>Blanc sous 10"</span></div>
+    </div>
+
+    <!-- BODY -->
+    <div class="plq-body">
+      <div class="plq-col">
+        <div class="plq-col-title">Parcours</div>
+        <ul class="timeline">
+          <li class="tl-item"><span class="tl-year">2010</span><div class="tl-dot"></div><div class="tl-text"><strong>Berlin — Triple Champion d'Europe</strong><span>100m, 200m, relais · 1er Européen blanc sous 10" (9"97)</span></div></li>
+          <li class="tl-item"><span class="tl-year">2011</span><div class="tl-dot"></div><div class="tl-text"><strong>Daegu — Bronze Mondial 200m</strong><span>19"80 · Record de France pulvérisé de 36 centièmes</span></div></li>
+          <li class="tl-item"><span class="tl-year">2012</span><div class="tl-dot"></div><div class="tl-text"><strong>Londres — Bronze Olympique relais</strong><span>Première médaille olympique de l'équipe de France</span></div></li>
+          <li class="tl-item"><span class="tl-year">2016</span><div class="tl-dot"></div><div class="tl-text"><strong>Rio — Bronze Olympique 200m</strong><span>19"76 · Meilleure performance personnelle</span></div></li>
+          <li class="tl-item"><span class="tl-year">2024</span><div class="tl-dot" style="background:var(--gold);"></div><div class="tl-text"><strong>Retraite & Nouveau départ</strong><span>BPJEPS · Coach fitness en Moselle (Metz)</span></div></li>
+        </ul>
+      </div>
+      <div class="plq-col">
+        <div class="plq-col-title">Offre de communication & coaching</div>
+        <ul class="svc-list">
+          <li class="svc-item"><span class="svc-icon">🎤</span><div class="svc-text"><strong>Conférences & prises de parole</strong><small>Sport, performance, reconversion, mental d'athlète</small></div></li>
+          <li class="svc-item"><span class="svc-icon">🎬</span><div class="svc-text"><strong>Contenu YouTube & réseaux sociaux</strong><small>Chaîne officielle · coaching digital · vlogs techniques</small></div></li>
+          <li class="svc-item"><span class="svc-icon">🏋️</span><div class="svc-text"><strong>Coaching fitness privé & collectif</strong><small>Sprints, HIIT, préparation physique · Moselle & distance</small></div></li>
+          <li class="svc-item"><span class="svc-icon">🤝</span><div class="svc-text"><strong>Partenariats & ambassadeur</strong><small>Marques sport, nutrition, équipements, institutions</small></div></li>
+          <li class="svc-item"><span class="svc-icon">🏫</span><div class="svc-text"><strong>Interventions écoles & clubs</strong><small>Initiations sprint, partage d'expérience olympique</small></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- QUOTE -->
+    <div class="plq-quote">
+      <blockquote>"La retraite sportive n'est pas une fin — c'est la deuxième course. Et je veux la courir aussi vite que la première."</blockquote>
+      <cite>— Christophe Lemaitre</cite>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="plq-social">
+      <div class="social-pill"><div class="s-dot" style="background:#FF0000;"></div>YouTube · @CLemaitre992</div>
+      <div class="social-pill"><div class="s-dot" style="background:#1877F2;"></div>Facebook · Christophe Lemaitre Officiel</div>
+      <div class="social-pill"><div class="s-dot" style="background:#fff;"></div>Twitter/X · @CLemaitre992</div>
+      <div class="social-pill"><div class="s-dot" style="background:#E4405F;"></div>Instagram · @c.lemaitre_official</div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="plq-footer">
+      <div class="plq-footer-logo">CL<em>·</em>992</div>
+      <div class="plq-bars">
+        <div class="plq-bar" style="height:28px; background:var(--blue);"></div>
+        <div class="plq-bar" style="height:20px; background:#fff;"></div>
+        <div class="plq-bar" style="height:14px; background:var(--red);"></div>
+      </div>
+      <div class="plq-footer-contact">
+        contact@christophelemaitre.fr<br>
+        Metz, Moselle · France & International<br>
+        <span style="color:#333;">© 2026 Christophe Lemaitre</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     FOOTER GLOBAL
+════════════════════════════════════════ -->
+<footer>
+  <div class="footer-links">
+    <a href="https://france3-regions.franceinfo.fr/grand-est/moselle/metz/christophe-lemaitre-le-plus-grand-sprinteur-francais-de-l-histoire-devenu-coach-de-fitness-en-moselle-3214988.html">France 3 — Reconversion Lemaitre</a>
+    <a href="https://worldathletics.org/athletes/france/christophe-lemaitre-14186000">World Athletics — Palmarès officiel</a>
+    <a href="https://www.epidemicsound.com/blog/youtube-trends-2026/">YouTube Trends 2026</a>
+    <a href="https://metricool.com/fr/influenceurs-sport/">Influenceurs Sport 2026</a>
+  </div>
+  <div>Dossier de communication · Christophe Lemaitre · Agent Comm Sport 2026</div>
+</footer>
+
+<!-- ════════════════════════════════════════
+     JS — Navigation
+════════════════════════════════════════ -->
+<script>
+function show(id) {
+  // Hide all sections (except hero which is handled below)
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  const target = document.getElementById(id);
+  if (target) {
+    target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Highlight correct nav button
+  const buttons = document.querySelectorAll('.nav-btn');
+  const labels = ['hero','tendances','facebook','twitter','youtube','identite','plaquette'];
+  const idx = labels.indexOf(id);
+  if (idx >= 0 && buttons[idx]) buttons[idx].classList.add('active');
+}
+
+// Make hero section full-page (remove max-width constraint from .section)
+document.getElementById('hero').style.maxWidth = '100%';
+document.getElementById('hero').style.padding = '0';
+</script>
+
+</body>
+</html>
