@@ -76,17 +76,58 @@ nav {
 ══════════════════════════════════════════ */
 .hero {
   min-height: 100vh;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  text-align: center; padding: 80px 32px 60px;
+  display: flex; align-items: center;
+  padding: 80px 60px 60px;
   position: relative; overflow: hidden;
-  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,63,190,0.18) 0%, transparent 70%);
+  background: radial-gradient(ellipse 80% 70% at 30% 50%, rgba(0,63,190,0.18) 0%, transparent 65%);
+}
+.hero-inner {
+  display: flex; align-items: center; gap: 64px;
+  max-width: 1200px; margin: 0 auto; width: 100%;
+}
+.hero-left { flex: 1; min-width: 0; }
+.hero-right {
+  flex: 0 0 380px; display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+}
+.hero-photo-wrap {
+  position: relative; width: 340px; height: 420px;
+  border-radius: 20px; overflow: hidden;
+  border: 2px solid rgba(201,162,39,0.35);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+}
+.hero-photo-wrap img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center top;
+  filter: grayscale(15%) contrast(1.05);
+  transition: transform 0.4s ease;
+}
+.hero-photo-wrap:hover img { transform: scale(1.03); }
+.hero-photo-wrap::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(6,6,16,0.85) 100%);
+  pointer-events: none;
+}
+.hero-photo-caption {
+  position: absolute; bottom: 16px; left: 16px; right: 16px;
+  z-index: 2; display: flex; align-items: center; gap: 8px;
+}
+.hero-photo-badge {
+  background: var(--gold); color: var(--darker);
+  font-size: 10px; font-weight: 900; letter-spacing: 1px;
+  padding: 4px 10px; border-radius: 20px;
+}
+.hero-photo-year { font-size: 12px; color: rgba(248,248,255,0.7); }
+.hero-photo-credit {
+  font-size: 10px; color: rgba(248,248,255,0.3);
+  text-align: center; margin-top: 4px;
 }
 .hero-bg-number {
-  position: absolute; left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: clamp(160px, 30vw, 340px);
-  font-weight: 900; letter-spacing: -10px;
-  color: rgba(201,162,39,0.05); pointer-events: none;
+  position: absolute; right: -40px; top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(160px, 20vw, 280px);
+  font-weight: 900; letter-spacing: -8px;
+  color: rgba(201,162,39,0.04); pointer-events: none;
   white-space: nowrap; line-height: 1;
 }
 .hero-track {
@@ -99,31 +140,40 @@ nav {
   background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.3);
   color: var(--gold); font-size: 11px; font-weight: 700;
   letter-spacing: 3px; text-transform: uppercase;
-  padding: 8px 20px; border-radius: 30px; margin-bottom: 32px;
+  padding: 8px 20px; border-radius: 30px; margin-bottom: 28px;
 }
 .hero h1 {
-  font-size: clamp(42px, 8vw, 96px);
+  font-size: clamp(36px, 6vw, 80px);
   font-weight: 900; line-height: 0.95; letter-spacing: -2px;
   margin-bottom: 16px;
 }
 .hero h1 em { color: var(--gold); font-style: normal; display: block; }
 .hero-sub {
-  font-size: clamp(14px, 2vw, 18px); color: var(--muted);
-  max-width: 560px; margin: 0 auto 40px;
+  font-size: clamp(14px, 1.5vw, 17px); color: var(--muted);
+  max-width: 500px; margin-bottom: 36px; line-height: 1.7;
 }
 .hero-stats {
-  display: flex; gap: 0; flex-wrap: wrap; justify-content: center;
+  display: flex; gap: 0; flex-wrap: wrap;
   border: 1px solid var(--border); border-radius: var(--radius);
-  overflow: hidden; margin-bottom: 48px;
+  overflow: hidden; margin-bottom: 36px;
 }
 .hero-stat {
-  padding: 20px 32px; border-right: 1px solid var(--border); text-align: center;
+  padding: 16px 24px; border-right: 1px solid var(--border); text-align: center;
 }
 .hero-stat:last-child { border-right: none; }
-.hero-stat strong { display: block; font-size: 28px; font-weight: 900; color: var(--gold); }
-.hero-stat span { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
+.hero-stat strong { display: block; font-size: 24px; font-weight: 900; color: var(--gold); }
+.hero-stat span { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
 .hero-cta {
-  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+@media (max-width: 900px) {
+  .hero { padding: 80px 24px 60px; }
+  .hero-inner { flex-direction: column-reverse; gap: 40px; text-align: center; }
+  .hero-right { flex: none; }
+  .hero-photo-wrap { width: 280px; height: 340px; }
+  .hero-sub { max-width: 100%; }
+  .hero-stats { justify-content: center; }
+  .hero-cta { justify-content: center; }
 }
 .btn-primary {
   background: var(--gold); color: var(--darker);
@@ -462,24 +512,63 @@ footer .footer-links a:hover { color: var(--white); }
 <div id="hero" class="section active" style="max-width:100%; padding-top:0;">
   <div class="hero">
     <div class="hero-bg-number">9.92</div>
-    <div class="hero-tag">
-      <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#C9A227"/></svg>
-      Dossier Communication Digitale 2026
-    </div>
-    <h1>CHRISTOPHE<em>LEMAITRE</em></h1>
-    <p class="hero-sub">Stratégie de communication complète pour l'ancien sprinter olympique, médaillé de bronze à Rio 2016 et premier Européen blanc sous les 10 secondes.</p>
 
-    <div class="hero-stats">
-      <div class="hero-stat"><strong>9"92</strong><span>Record 100m</span></div>
-      <div class="hero-stat"><strong>3×</strong><span>Champion d'Europe</span></div>
-      <div class="hero-stat"><strong>🥉</strong><span>Bronze JO Rio</span></div>
-      <div class="hero-stat"><strong>1er</strong><span>Blanc sous 10"</span></div>
-      <div class="hero-stat"><strong>2026</strong><span>Nouvelle carrière</span></div>
-    </div>
+    <div class="hero-inner">
+      <!-- TEXTE -->
+      <div class="hero-left">
+        <div class="hero-tag">
+          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#C9A227"/></svg>
+          Dossier Communication Digitale 2026
+        </div>
+        <h1>CHRISTOPHE<em>LEMAITRE</em></h1>
+        <p class="hero-sub">Stratégie de communication complète pour l'ancien sprinter olympique, médaillé de bronze à Rio 2016 et premier Européen blanc sous les 10 secondes.</p>
 
-    <div class="hero-cta">
-      <button class="btn-primary" onclick="show('tendances')">Voir la stratégie</button>
-      <button class="btn-outline" onclick="show('plaquette')">Consulter la plaquette</button>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>9"92</strong><span>Record 100m</span></div>
+          <div class="hero-stat"><strong>3×</strong><span>Champion EU</span></div>
+          <div class="hero-stat"><strong>🥉</strong><span>Bronze Rio</span></div>
+          <div class="hero-stat"><strong>1er</strong><span>Blanc &lt;10"</span></div>
+        </div>
+
+        <div class="hero-cta">
+          <button class="btn-primary" onclick="show('tendances')">Voir la stratégie</button>
+          <button class="btn-outline" onclick="show('plaquette')">Consulter la plaquette</button>
+        </div>
+      </div>
+
+      <!-- PHOTO -->
+      <div class="hero-right">
+        <div class="hero-photo-wrap">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/7/77/Christophe_Lemaitre_Berlin_2009.JPG"
+            alt="Christophe Lemaitre — Championnats du monde de Berlin 2009"
+            loading="eager"
+            onerror="this.style.display='none'; this.parentNode.querySelector('.hero-photo-fallback').style.display='flex';"
+          />
+          <div class="hero-photo-fallback" style="display:none; width:100%; height:100%; background:linear-gradient(135deg,#001266,#003FBE); align-items:center; justify-content:center; flex-direction:column; gap:16px;">
+            <svg width="120" height="120" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" style="opacity:0.7">
+              <line x1="95" y1="210" x2="72" y2="262" stroke="#F8F8FF" stroke-width="10" stroke-linecap="round"/>
+              <rect x="66" y="258" width="18" height="8" rx="4" fill="#CC0020"/>
+              <line x1="95" y1="210" x2="118" y2="250" stroke="#F8F8FF" stroke-width="10" stroke-linecap="round"/>
+              <line x1="118" y1="250" x2="138" y2="262" stroke="#F8F8FF" stroke-width="9" stroke-linecap="round"/>
+              <rect x="130" y="258" width="18" height="8" rx="4" fill="#CC0020"/>
+              <rect x="80" y="155" width="35" height="58" rx="10" fill="#003FBE" stroke="#F8F8FF" stroke-width="1"/>
+              <line x1="80" y1="168" x2="57" y2="195" stroke="#F8F8FF" stroke-width="9" stroke-linecap="round"/>
+              <line x1="115" y1="168" x2="138" y2="148" stroke="#F8F8FF" stroke-width="9" stroke-linecap="round"/>
+              <circle cx="99" cy="120" r="22" fill="#D4A574"/>
+              <polygon points="155,60 142,90 152,90 136,120 163,85 152,85 168,60" fill="#FFE033" opacity="0.9"/>
+            </svg>
+            <span style="color:rgba(248,248,255,0.5); font-size:12px;">Photo non disponible</span>
+          </div>
+          <div class="hero-photo-caption">
+            <span class="hero-photo-badge">BERLIN 2009</span>
+            <span class="hero-photo-year">Championnats du monde</span>
+          </div>
+        </div>
+        <div class="hero-photo-credit">
+          Photo : © Wikimedia Commons · CC BY-SA 3.0
+        </div>
+      </div>
     </div>
 
     <div class="hero-track"></div>
