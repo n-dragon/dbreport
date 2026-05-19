@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plaquette – Christophe Lemaitre</title>
+<style>
+  :root {
+    --blue:  #003FBE;
+    --gold:  #C9A227;
+    --dark:  #0D0D1A;
+    --white: #F8F8FF;
+    --red:   #CC0020;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #e8e8f0; }
+
+  /* A4 SIMULATION */
+  .page {
+    width: 794px; min-height: 1123px; margin: 40px auto;
+    background: var(--dark); color: var(--white);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    position: relative; overflow: hidden;
+  }
+
+  /* BACKGROUND DECORATION */
+  .bg-deco {
+    position: absolute; top: 0; right: 0;
+    width: 400px; height: 100%;
+    background: linear-gradient(160deg, rgba(0,63,190,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .bg-number {
+    position: absolute; right: 30px; top: 60px;
+    font-size: 200px; font-weight: 900; color: rgba(201,162,39,0.06);
+    line-height: 1; letter-spacing: -8px; user-select: none;
+  }
+
+  /* HEADER BAND */
+  .header {
+    display: flex; align-items: stretch;
+    border-bottom: 3px solid var(--gold);
+  }
+  .header-blue {
+    background: var(--blue); width: 8px; flex-shrink: 0;
+  }
+  .header-red {
+    background: var(--red); width: 8px; flex-shrink: 0;
+  }
+  .header-content {
+    padding: 40px 40px 32px;
+    flex: 1;
+  }
+  .header-tag { font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .header-name { font-size: 52px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+  .header-name span { color: var(--gold); }
+  .header-role { margin-top: 8px; font-size: 15px; color: rgba(248,248,255,0.6); letter-spacing: 2px; text-transform: uppercase; }
+  .header-logo {
+    padding: 32px 40px; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* GOLD LINE */
+  .gold-rule { height: 2px; background: linear-gradient(90deg, var(--gold), transparent); margin: 0 40px; }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex; padding: 28px 40px; gap: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat { flex: 1; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); padding: 0 16px; }
+  .stat:last-child { border-right: none; }
+  .stat-value { font-size: 32px; font-weight: 900; color: var(--gold); line-height: 1; }
+  .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(248,248,255,0.5); margin-top: 4px; }
+
+  /* CONTENT */
+  .content { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .col { padding: 36px 40px; }
+  .col:first-child { border-right: 1px solid rgba(255,255,255,0.08); }
+
+  h2.section { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid rgba(201,162,39,0.3); }
+
+  /* TIMELINE */
+  .timeline { list-style: none; padding: 0; }
+  .timeline li { display: flex; gap: 14px; margin-bottom: 18px; align-items: flex-start; }
+  .tl-year { font-size: 12px; font-weight: 700; color: var(--gold); min-width: 38px; padding-top: 2px; }
+  .tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); margin-top: 4px; flex-shrink: 0; border: 2px solid var(--gold); }
+  .tl-text strong { display: block; font-size: 13px; font-weight: 700; }
+  .tl-text span { font-size: 12px; color: rgba(248,248,255,0.55); line-height: 1.4; }
+
+  /* SERVICES */
+  .services { list-style: none; }
+  .services li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
+  .services li:last-child { border-bottom: none; }
+  .svc-icon { font-size: 20px; min-width: 28px; }
+  .svc-text strong { display: block; font-size: 13px; }
+  .svc-text span { font-size: 11px; color: rgba(248,248,255,0.5); }
+
+  /* QUOTE */
+  .quote-block {
+    margin: 0 40px; padding: 28px 32px;
+    background: rgba(0,63,190,0.15);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+  }
+  .quote-text { font-size: 17px; font-style: italic; line-height: 1.6; color: var(--white); }
+  .quote-author { margin-top: 12px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+
+  /* RESEAUX */
+  .social-row { display: flex; gap: 12px; margin: 28px 40px 0; }
+  .social-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 30px; padding: 8px 16px; font-size: 12px; font-weight: 600;
+    flex: 1; justify-content: center;
+  }
+  .social-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* FOOTER */
+  .footer-band { display: flex; align-items: center; padding: 20px 40px; margin-top: 36px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .footer-logo { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+  .footer-logo span { color: var(--gold); }
+  .footer-contact { margin-left: auto; text-align: right; font-size: 11px; color: rgba(248,248,255,0.4); line-height: 1.8; }
+  .footer-bars { display: flex; gap: 4px; margin-left: 30px; }
+  .footer-bar { width: 6px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- BG DECORATION -->
+  <div class="bg-deco"></div>
+  <div class="bg-number">9.92</div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-blue"></div>
+    <div class="header-red"></div>
+    <div class="header-content">
+      <div class="header-tag">Dossier de présentation · Agent Comm Sport 2026</div>
+      <div class="header-name">CHRISTOPHE<br><span>LEMAITRE</span></div>
+      <div class="header-role">Sprinter olympique · Champion d'Europe · Coach Fitness</div>
+    </div>
+    <div class="header-logo">
+      <svg width="130" height="130" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+        <!-- Circle bg -->
+        <circle cx="65" cy="65" r="63" fill="rgba(0,63,190,0.15)" stroke="#C9A227" stroke-width="1.5"/>
+        <!-- CL text -->
+        <text x="12" y="82" font-family="Arial Black,sans-serif" font-size="56" font-weight="900" fill="#F8F8FF" letter-spacing="-3">CL</text>
+        <!-- Lightning -->
+        <polygon points="82,22 74,46 80,46 70,72 90,44 83,44 94,22" fill="#C9A227" opacity="0.9"/>
+        <!-- 9.92 -->
+        <text x="65" y="115" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#C9A227" text-anchor="middle" letter-spacing="2">9 · 9 2</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-value">9"92</div>
+      <div class="stat-label">Record 100m</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">3×</div>
+      <div class="stat-label">Champion d'Europe</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">🥉</div>
+      <div class="stat-label">Bronze JO Rio 2016</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">14</div>
+      <div class="stat-label">Ans de carrière</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">1er</div>
+      <div class="stat-label">Européen blanc &lt;10"</div>
+    </div>
+  </div>
+
+  <!-- CONTENT GRID -->
+  <div class="content">
+
+    <!-- COL 1 — Carrière -->
+    <div class="col">
+      <h2 class="section">Parcours</h2>
+      <ul class="timeline">
+        <li>
+          <span class="tl-year">2010</span>
+          <div class="tl-dot"></div>
+          <div class="tl-text">
+            <strong>Berlin — Triple Champion d'Europe</strong>
+            <span>100m, 200m, relais 4×100m · 1er Européen blanc sous les 10 secondes (9"97)</span>
+          </div>
+        </li>
+        <li>
+          <span class="tl-year">2011</span>
+          <div class="tl-dot"></div>
+          <div class="tl-text">
+            <strong>Daegu — Bronze Mondial 200m</strong>
+            <span>19"80 · Pulvérise le record de France de 36 centièmes</span>
+          </div>
+        </li>
+        <li>
+          <span class="tl-year">2012</span>
+          <div class="tl-dot"></div>
+          <div class="tl-text">
+            <strong>Londres — Bronze Olympique relais</strong>
+            <span>Première médaille olympique individuelle de l'équipe de France</span>
+          </div>
+        </li>
+        <li>
+          <span class="tl-year">2016</span>
+          <div class="tl-dot"></div>
+          <div class="tl-text">
+            <strong>Rio — Bronze Olympique 200m</strong>
+            <span>19"76 · Meilleure performance personnelle · 3e mondial</span>
+          </div>
+        </li>
+        <li>
+          <span class="tl-year">2024</span>
+          <div class="tl-dot" style="background:var(--gold);"></div>
+          <div class="tl-text">
+            <strong>Fin de carrière · Nouveau départ</strong>
+            <span>BPJEPS obtenu · Coach fitness en Moselle (Metz) · Transmission de l'excellence</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- COL 2 — Services / Offre -->
+    <div class="col">
+      <h2 class="section">Offre de communication & coaching</h2>
+      <ul class="services">
+        <li>
+          <span class="svc-icon">🎤</span>
+          <div class="svc-text">
+            <strong>Conférences & prises de parole</strong>
+            <span>Sport, performance, reconversion, mental d'athlète</span>
+          </div>
+        </li>
+        <li>
+          <span class="svc-icon">🎬</span>
+          <div class="svc-text">
+            <strong>Contenu YouTube & réseaux sociaux</strong>
+            <span>Chaîne officielle · coaching digital · vlogs techniques</span>
+          </div>
+        </li>
+        <li>
+          <span class="svc-icon">🏋️</span>
+          <div class="svc-text">
+            <strong>Coaching fitness privé & collectif</strong>
+            <span>Sprints, cardio HIIT, préparation physique · Moselle & distance</span>
+          </div>
+        </li>
+        <li>
+          <span class="svc-icon">🤝</span>
+          <div class="svc-text">
+            <strong>Partenariats & ambassadeur</strong>
+            <span>Marques sport, nutrition, équipements, institutions</span>
+          </div>
+        </li>
+        <li>
+          <span class="svc-icon">📚</span>
+          <div class="svc-text">
+            <strong>Programmes en ligne</strong>
+            <span>Cours vidéo sprint & athlétisme · tous niveaux</span>
+          </div>
+        </li>
+        <li>
+          <span class="svc-icon">🏫</span>
+          <div class="svc-text">
+            <strong>Interventions écoles & clubs</strong>
+            <span>Initiations sprint, partage d'expérience olympique</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- QUOTE -->
+  <div class="quote-block">
+    <div class="quote-text">"La retraite sportive n'est pas une fin — c'est la deuxième course. Et je veux la courir aussi vite que la première."</div>
+    <div class="quote-author">— Christophe Lemaitre</div>
+  </div>
+
+  <!-- SOCIAL MEDIA -->
+  <div class="social-row">
+    <div class="social-pill">
+      <div class="dot" style="background:#FF0000;"></div>
+      YouTube · @CLemaitre992
+    </div>
+    <div class="social-pill">
+      <div class="dot" style="background:#1877F2;"></div>
+      Facebook · Christophe Lemaitre Officiel
+    </div>
+    <div class="social-pill">
+      <div class="dot" style="background:#fff;"></div>
+      Twitter/X · @CLemaitre992
+    </div>
+    <div class="social-pill">
+      <div class="dot" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);"></div>
+      Instagram · @c.lemaitre_official
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-band">
+    <div class="footer-logo">CL<span>·</span>992</div>
+    <div class="footer-bars">
+      <div class="footer-bar" style="height:30px; background:#003FBE;"></div>
+      <div class="footer-bar" style="height:22px; background:#F8F8FF;"></div>
+      <div class="footer-bar" style="height:16px; background:#CC0020;"></div>
+    </div>
+    <div class="footer-contact">
+      contact@christophelemaitre.fr · +33 (0)X XX XX XX XX<br>
+      Metz, Moselle · Disponible France entière & International<br>
+      <span style="color:rgba(248,248,255,0.25);">© 2026 Christophe Lemaitre · Tous droits réservés</span>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center; padding:20px; color:#888; font-size:12px;">
+  Format A4 simulé · Plaquette de présentation Christophe Lemaitre 2026<br>
+  <em>Pour impression : Ctrl+P → Sauvegarder en PDF</em>
+</div>
+
+</body>
+</html>
