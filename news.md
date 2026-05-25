@@ -1,3 +1,173 @@
+# Actualité technique des bases de données — 2026-05-25
+
+---
+
+## 1. PostgreSQL 18 Beta — ce qui change
+
+PostgreSQL 18 est entré en phase bêta publique début mai 2026 avec plusieurs évolutions majeures :
+
+### Asynchronous I/O (AIO) natif
+
+La contribution la plus attendue : le moteur remplace ses appels `pread`/`pwrite` synchrones par un vrai modèle d'I/O asynchrone (`io_uring` sur Linux, IOCP sur Windows). Les benchmarks préliminaires montrent des gains de **20 à 40 %** sur les workloads I/O-bound à haute concurrence, sans aucune modification applicative.
+
+### Planner amélioré : skip scan & partition pruning dynamique
+
+- **Index Skip Scan** natif : accélère considérablement les requêtes de type `SELECT DISTINCT col` ou les plages sur colonnes de faible cardinalité sans créer d'index dédié.
+- **Partition pruning dynamique étendu** : le planificateur peut désormais éliminer des partitions à l'exécution (runtime) même pour des jointures complexes.
+
+### `pg_basebackup` incrémental
+
+Les sauvegardes physiques incrémentielles arrivent enfin en natif : seuls les blocs modifiés depuis le dernier backup sont transférés. Réduction typique de 80 à 95 % du volume réseau pour les bases volumineuses.
+
+### OAuth 2.0 / OAUTHBEARER comme méthode d'authentification standard
+
+PostgreSQL 18 intègre nativement OAUTHBEARER dans `pg_hba.conf`, simplifiant l'intégration avec les fournisseurs d'identité modernes (Keycloak, Okta, Azure AD) sans extension tierce.
+
+---
+
+## 2. DuckDB 1.2 — moteur analytique embarqué de référence
+
+DuckDB 1.2 (sorti mai 2026) consolide sa position de moteur analytique in-process :
+
+| Feature | Détail |
+|---|---|
+| **Delta Lake natif** | Lecture/écriture Delta Lake sans Spark, via extension officielle |
+| **Iceberg writer** | Écriture de tables Iceberg directement depuis DuckDB |
+| **Persistent secrets** | Gestion sécurisée des credentials cloud (S3, GCS, Azure) |
+| **Multi-database attach** | Attacher plusieurs fichiers `.duckdb` ou sources externes en même temps |
+| **Arrow Flight SQL** | Protocole standard pour la communication inter-systèmes haute performance |
+
+**Cas d'usage émergent :** DuckDB comme moteur de transformation local dans les pipelines dbt, remplaçant Spark pour les volumes < 100 Go.
+
+---
+
+## 3. Nouvelles fonctionnalités IA dans les bases de données cloud
+
+### Amazon Aurora DSQL — distributed SQL sans friction
+
+AWS a annoncé la disponibilité générale d'**Aurora DSQL** : base de données PostgreSQL-compatible à cohérence forte distribuée (protocole Raft optimisé), conçue pour les workloads multi-régions actif-actif. Latence d'écriture cross-région < 50 ms dans la même zone géographique.
+
+### Google AlloyDB AI
+
+AlloyDB intègre désormais **Vertex AI Embeddings** directement dans le moteur : la fonction `embedding()` génère des vecteurs en SQL sans quitter la base, avec cache automatique pour éviter les appels redondants à l'API d'embedding.
+
+```sql
+SELECT id, title,
+       embedding('text-embedding-005', description) AS vec
+FROM products;
+```
+
+### Snowflake Arctic Embed v2
+
+Snowflake a lancé **Arctic Embed v2**, un modèle d'embedding open-source spécialisé pour les données structurées (tables, JSON). Il surpasse OpenAI `text-embedding-3-large` sur les benchmarks MTEB pour les données tabulaires, et s'intègre nativement dans Snowflake Cortex Search.
+
+---
+
+## 4. Optimisation : les grandes tendances de mai 2026
+
+### Learned Indexes — passage à la production
+
+Les indexes appris par ML (Learned Index Structures, travaux Kraska et al.) commencent à apparaître dans des systèmes de production :
+- **CockroachDB** expérimente un B-Tree guidé par un modèle pour réduire la profondeur d'arbre sur les clés prévisibles.
+- **Neon** intègre un prefetcher ML qui précharge les pages en fonction des patterns d'accès historiques.
+
+### Query result caching intelligent
+
+Au-delà du cache naïf par hash de requête, les nouvelles approches invalident sélectivement les résultats en cache selon les dépendances logiques (tables touchées, plages de valeurs) :
+- **PGBouncer 2.0** expose un protocole de cache-hint que le planificateur PostgreSQL peut utiliser.
+- **Materialize** (streaming SQL) maintient des vues matérialisées incrémentalement en temps réel.
+
+### Compression adaptative
+
+ClickHouse 24.x introduit la **compression adaptative par colonne** : le moteur choisit automatiquement entre LZ4, ZSTD, Gorilla (pour les séries temporelles) et T64 selon les statistiques de la colonne, sans configuration manuelle.
+
+---
+
+## 5. Sécurité — nouvelles pratiques
+
+### Transparent Data Encryption (TDE) dans PostgreSQL
+
+Après des années d'attente, **PostgreSQL 18** intègre le TDE en option de compilation officielle (via `--with-tde`). Les pages sont chiffrées au niveau du buffer manager avec AES-256-XTS. Plus besoin de patches externes comme `pgcrypto` ou des forks Percona/Cybertec.
+
+### Zero Trust pour les connexions inter-nœuds
+
+CockroachDB et YugabyteDB ont tous deux durci leur modèle de réseau interne :
+- mTLS obligatoire entre tous les nœuds du cluster (plus d'option de désactivation)
+- Rotation automatique des certificats internes sans redémarrage
+- Chiffrement au repos configurable par tenant dans les déploiements multi-tenant
+
+### Détection d'anomalies comportementales
+
+Amazon RDS Threat Detection (preview) et Google Cloud SQL Threat Intelligence utilisent désormais des modèles comportementaux (baseline d'accès normal) pour détecter automatiquement les exfiltrations de données, injections SQL et accès hors-horaire — et bloquer en temps réel.
+
+---
+
+## 6. Observabilité — état de l'art 2026
+
+### OpenTelemetry devient le standard
+
+Les bases de données exportent nativement leurs traces, métriques et logs via **OTLP (OpenTelemetry Protocol)** :
+- CockroachDB : traces distribuées nativement OTLP depuis v23.2
+- AlloyDB : intégration Google Cloud Trace native
+- MongoDB Atlas : export OTLP vers tout backend compatible (Grafana, Honeycomb, Datadog)
+
+**Impact :** fin de la fragmentation des agents de monitoring propriétaires.
+
+### Diagnostics continus avec eBPF
+
+La suite **Pixie** (CNCF) couvre maintenant les requêtes SQL avec reconstruction automatique du plan d'exécution depuis les tracepoints noyau — sans modifier le client ni le serveur, avec overhead < 1 % en production.
+
+---
+
+## 7. Edge & Serverless — accélération
+
+### Turso (libSQL) v1.0
+
+**Turso** (fork de SQLite pour l'edge distribué) atteint la v1.0 avec :
+- **Embedded replicas** : réplique locale SQLite synchronisée avec le primaire Turso Cloud, lectures à latence zéro
+- **Multi-tenancy natif** : milliers de bases isolées par compte, facturé à la requête
+- **Branching** : création de branches de base de données en millisecondes pour les environnements de preview
+
+### Cloudflare D1 — disponibilité générale
+
+Cloudflare D1 (SQLite distribué sur edge) est sorti en GA avec :
+- Réplication automatique dans 300+ PoPs
+- Support des transactions multi-statements
+- Intégration native avec Workers AI pour les requêtes hybrides SQL + vectorielles
+
+---
+
+## 8. À surveiller dans les prochaines semaines
+
+| Événement | Date estimée | Impact attendu |
+|---|---|---|
+| **PostgreSQL 18 Beta 2** | Juin 2026 | Stabilisation AIO, benchmarks officiels |
+| **MongoDB World 2026** | Juin 2026 | Annonces Atlas Stream Processing v2 |
+| **Snowflake Summit 2026** | Juin 2026 | Nouvelles fonctionnalités Cortex AI |
+| **AWS re:Inforce 2026** | Juillet 2026 | Sécurité Aurora DSQL, RDS Threat Detection GA |
+| **VLDB 2026** | Août 2026 | Publications académiques : learned indexes, AQE next-gen |
+
+---
+
+## Synthèse du 2026-05-25
+
+| Axe | Signal du mois |
+|---|---|
+| **Moteur** | PostgreSQL 18 AIO — gain réel sans changement applicatif |
+| **Analytique embarquée** | DuckDB 1.2 écrit Iceberg et Delta Lake nativement |
+| **IA in-database** | Embeddings en SQL natif (AlloyDB, Aurora, Snowflake) |
+| **Sécurité** | TDE PostgreSQL officiel, détection comportementale cloud |
+| **Edge** | Turso v1.0 GA, Cloudflare D1 en production |
+| **Observabilité** | OpenTelemetry comme standard universel d'export |
+
+> Le mois de mai 2026 marque un tournant : les fonctionnalités longtemps réservées aux bases cloud propriétaires (I/O asynchrone, TDE, embeddings natifs, branchement) arrivent dans les moteurs open-source de référence.
+
+---
+
+*Rapport rédigé le 2026-05-25 — Sources : release notes PostgreSQL 18 beta, DuckDB 1.2 changelog, AWS blog Aurora DSQL, Google Cloud AlloyDB AI docs, Snowflake blog Arctic Embed v2, Turso v1.0 release, Cloudflare D1 GA announcement, SIGMOD/VLDB 2025-2026.*
+
+---
+
 # Actualité technique des bases de données — 2026-05-19
 
 ---
