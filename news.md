@@ -1,3 +1,153 @@
+# Actualité technique des bases de données — 2026-06-01
+
+---
+
+## 1. PostgreSQL 18 — ce qui change vraiment
+
+PostgreSQL 18 a été publié en 2025. La refonte majeure concerne le sous-système d'I/O : le nouveau moteur **asynchronous I/O (AIO)** permet d'émettre plusieurs requêtes disque en parallèle au lieu d'attendre chaque opération. Les gains mesurés atteignent **2× à 3× sur les scans séquentiels**, les bitmap heap scans et VACUUM.
+
+| Nouveauté | Impact |
+|---|---|
+| **Async I/O (AIO)** | ×2–3 sur sequential scans et VACUUM |
+| **Skip scan B-tree** | Index multi-colonnes utilisables même si la 1ʳᵉ colonne n'est pas filtrée |
+| **`uuidv7()`** | UUIDs ordonnés temporellement nativement en SQL |
+| **Colonnes générées virtuelles** | Calculées à la lecture, sans stockage physique (nouveau défaut) |
+| **`RETURNING OLD / NEW`** | Clauses RETURNING dans INSERT, UPDATE, DELETE, MERGE |
+| **Authentification OAuth 2.0** | Intégration native avec les fournisseurs d'identité modernes |
+| **Temporal constraints** | Contraintes PRIMARY KEY / UNIQUE / FK sur des plages de temps |
+| **Statistiques préservées à l'upgrade** | Plus de dégradation post-`pg_upgrade` en attendant `ANALYZE` |
+
+---
+
+## 2. SQL Server 2025 — le premier SGBD « AI-native »
+
+Microsoft positionne SQL Server 2025 comme le premier moteur où l'IA fait partie intégrante du moteur, pas une extension périphérique.
+
+### DiskANN — vecteurs à l'échelle du milliard
+
+L'algorithme **DiskANN** (Microsoft Research) est intégré nativement via `CREATE VECTOR INDEX`. Contrairement aux approches HNSW purement en mémoire, DiskANN exploite le stockage NVMe haute vitesse, permettant des recherches ANN sur **milliards de vecteurs** sans RAM proportionnelle.
+
+```sql
+-- Exemple de création d'index vectoriel DiskANN
+CREATE VECTOR INDEX idx_embeddings ON documents(embedding)
+WITH (ALGORITHM = DISKANN, METRIC = COSINE);
+```
+
+### Modèles IA directement en T-SQL
+
+SQL Server 2025 intègre un gestionnaire de modèles IA référençant Azure AI Foundry, Azure OpenAI, OpenAI, Ollama via REST API — sans quitter le moteur SQL. Intégration native avec LangChain, Semantic Kernel et Entity Framework Core.
+
+### Autres apports
+
+- **Intelligent Query Processing v4** : PSP Optimization étendu aux procédures stockées complexes.
+- **Parité Azure Arc** : fonctionnalités identiques on-prem et cloud.
+
+---
+
+## 3. DuckDB 1.4 LTS « Andium » — OLAP embarqué mature
+
+DuckDB 1.4.0 consolide la production-readiness avec des features longtemps attendues :
+
+| Feature | Détail |
+|---|---|
+| **Chiffrement AES-256-GCM** | Fichiers `.duckdb` chiffrés nativement |
+| **MERGE statement** | Upserts idiomatiques en SQL standard |
+| **Iceberg writes** | Écriture native au format Apache Iceberg |
+| **Spatial joins R-tree** | ×58 plus rapide pour les requêtes géospatiales |
+| **CTE materialization** | Optimisation automatique des Common Table Expressions |
+
+`pg_duckdb` 1.0 est sorti en parallèle, amenant les capacités analytiques vectorisées de DuckDB directement dans PostgreSQL sans changer de connexion.
+
+---
+
+## 4. Apache Iceberg + Apache Polaris — le lakehouse se standardise
+
+### Apache Polaris — catalogue officiel Iceberg
+
+Co-créé par Dremio et Snowflake, **Apache Polaris** a été diplômé comme **Apache Top-Level Project en février 2026** après 18 mois d'incubation avec Google, Microsoft, Confluent. Il implémente l'Iceberg REST Catalog spec et devient le plan de contrôle de référence pour les lakehouses multi-moteurs.
+
+La **version 1.4 d'avril 2026** apporte :
+- AWS STS Session Tag Customization
+- Storage-Scoped Key Management
+- Metrics Persistence
+
+### Interopérabilité universelle
+
+Spark, Flink, Trino, Dremio, StarRocks lisent et écrivent les mêmes tables Iceberg stockées sur S3/Azure Blob/GCS. L'ère des silos de formats propriétaires s'estompe.
+
+---
+
+## 5. Bases de données vectorielles — marché en hypercroissance
+
+Le marché des bases de données vectorielles croît de **377 % en glissement annuel** (2025), porté par l'adoption massive du **RAG (Retrieval-Augmented Generation)** en entreprise. Il passe de 2,8 Mds$ en 2025 à 8,5 Mds$ attendus en 2028.
+
+### État des forces en 2026
+
+| Système | Position | Différenciateur clé |
+|---|---|---|
+| **Qdrant** | Leader cloud | Filtrage payload, quantification vectorielle avancée |
+| **Pinecone** | Leader cloud managé | Simplicité opérationnelle, serverless |
+| **Turbopuffer** | Nouvel entrant agressif | Stockage objet comme backend, coût × faible |
+| **pgvector** (PG18) | Standard SQL | ACID + vector dans un seul système |
+| **Milvus / Zilliz** | Échelle massive | GPU acceleration, milliards de vecteurs |
+| **Chroma** | Dev/prototypage | Intégration LangChain/LlamaIndex triviale |
+
+### Tendances techniques
+
+- **Hybrid search BM25 + ANN** : combinaison systématique recherche sémantique + textuelle.
+- **Matryoshka Embedding** : vecteurs tronquables permettant d'ajuster coût/précision dynamiquement.
+- **Sparse + dense vectors** : SPLADE et autres modèles sparse pour améliorer le rappel.
+
+---
+
+## 6. La renaissance SQLite à l'edge
+
+2026 marque la **maturité de production du SQLite distribué** avec trois plateformes arrivées simultanément :
+
+| Plateforme | Latence | Particularité |
+|---|---|---|
+| **Turso (libSQL)** | ~625 µs (embedded replicas) | Architecture database-per-user, vecteur natif |
+| **Cloudflare D1** | < 10 ms | SQLite au plus près des 300 PoPs Cloudflare |
+| **Fly.io LiteFS** | < 1 ms régional | Réplication Raft sur SQLite standard |
+
+**Architecture database-per-user** : Turso permet des milliers de bases de données isolées par tenant à coût marginal nul — pattern qui était économiquement infaisable avec les SGBD traditionnels.
+
+**Convergence IA/edge** : Turso intègre la recherche vectorielle native (sans extension) pour les workloads RAG à la périphérie — chaque agent IA peut avoir sa propre base locale.
+
+---
+
+## 7. Bases de données agentiques — la prochaine frontière
+
+Avec l'essor des agents IA autonomes, un nouveau pattern émerge : **chaque agent possède sa propre base de données** pour stocker mémoire, fichiers, état de tâches. Cela implique :
+
+- **Stockage de mémoire long-terme** structuré (facts, preferences, history)
+- **Coordination multi-agents** via des tables partagées à accès concurrent
+- **Provenance des données** : traçabilité complète des décisions de l'agent
+
+Les acteurs qui se positionnent : Turso (database-per-agent), LanceDB (multimodal + agents), et les extensions pgvector + pg_trgm de PostgreSQL pour les agents à état riche.
+
+---
+
+## 8. Récapitulatif des signaux forts — Juin 2026
+
+| Axe | Signal | Maturité |
+|---|---|---|
+| **Performance I/O** | PostgreSQL 18 AIO (+200%) | Prod |
+| **IA native en SGBD** | SQL Server 2025 DiskANN + T-SQL AI | Prod |
+| **OLAP embarqué** | DuckDB 1.4 LTS + pg_duckdb | Prod |
+| **Formats ouverts** | Apache Iceberg + Polaris TLP | Prod |
+| **Vecteurs** | Turbopuffer, Qdrant, pgvector 0.8 | Prod |
+| **Edge/SQLite** | Turso, D1, LiteFS | Prod |
+| **Agents IA** | Database-per-agent, mémoire structurée | Émergent |
+
+> **Résumé :** en juin 2026, les bases de données ne se distinguent plus par leur modèle de données mais par leur capacité à intégrer l'IA et à opérer à la périphérie. PostgreSQL 18 et SQL Server 2025 matérialisent cette convergence côté moteur ; DuckDB et Apache Iceberg la matérialisent côté analyse distribuée.
+
+---
+
+*Rapport rédigé le 2026-06-01 — Sources : release notes PostgreSQL 18, SQL Server 2025 Blog Microsoft, DuckDB 1.4 changelog, Apache Polaris TLP announcement (fév. 2026), Ailog RAG Vector DB Trends 2026, DEV.to SQLite Edge Production 2026.*
+
+---
+
 # Actualité technique des bases de données — 2026-05-19
 
 ---
