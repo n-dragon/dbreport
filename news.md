@@ -1,3 +1,206 @@
+# Actualité technique des bases de données — 2026-06-15
+
+---
+
+## 1. PostgreSQL 18 — Beta en cours, faits marquants
+
+PostgreSQL 18 (Beta 1 publié en mai 2025, RC attendue T3 2025) introduit des changements architecturaux significatifs :
+
+### Asynchronous I/O natif
+
+Le changement le plus attendu depuis des années : PostgreSQL 18 remplace son I/O synchrone par un système **asynchronous I/O** (AIO) utilisant `io_uring` sous Linux et `IOCP` sous Windows. Les benchmarks préliminaires montrent des gains de **2× à 5×** sur les workloads I/O-bound (bulk load, vacuum, checkpoint).
+
+### Améliorations du planificateur
+
+- **`enable_group_by_reordering`** : le planificateur réordonne les colonnes de GROUP BY pour minimiser les tris inutiles.
+- Meilleures statistiques multi-colonnes pour les prédicats corrélés.
+- Parallélisme étendu aux `FULL OUTER JOIN`.
+
+### OAuth 2.0 natif
+
+PostgreSQL 18 intègre OAuth 2.0 comme méthode d'authentification native, simplifiant l'intégration avec les identity providers (Okta, Azure AD, Auth0).
+
+---
+
+## 2. DuckDB 1.x — Consolidation de l'OLAP embarqué
+
+Depuis la sortie de DuckDB 1.0 (juin 2024), la base analytique embarquée s'est imposée comme référence pour l'analyse locale et le data engineering léger.
+
+### Nouveautés 1.1 / 1.2
+
+| Feature | Impact |
+|---|---|
+| **Secret Manager** | Gestion des credentials cloud (S3, GCS, Azure) sans variables d'environnement |
+| **Delta Lake natif** | Lecture directe des tables Delta Lake via extension `delta` |
+| **Apache Iceberg** | Extension `iceberg` pour lecture des tables Iceberg REST catalog |
+| **JSON auto-schema** | Inférence automatique du schéma JSON en une passe |
+| **Spatial extension** | Fonctions géospatiales (H3, WKT, POINT, POLYGON) |
+| **Arrow streaming** | Échange zero-copy avec Apache Arrow Flight |
+
+### DuckDB + Python/dbt
+
+L'intégration `dbt-duckdb` permet des pipelines de transformation full-local sans serveur. Les équipes data utilisent DuckDB comme moteur de test local avant déploiement sur BigQuery/Snowflake, réduisant les coûts de CI de 70–90%.
+
+---
+
+## 3. L'écosystème Valkey vs Redis — la bifurcation open source
+
+### Chronologie de la crise
+
+En mars 2024, Redis Ltd a rebasculé Redis sous licence **SSPL + RSALv2** (non-OSI). En réponse, la Linux Foundation a lancé **Valkey**, un fork GPL-2.0 maintenu par Amazon, Google, Oracle et Ericsson.
+
+### État en 2025-2026
+
+| Projet | Version | Licence | Soutien |
+|---|---|---|---|
+| **Redis** | 8.x | Propriétaire (SSPL) | Redis Ltd |
+| **Valkey** | 8.x | BSD-3 (fork OSS) | Linux Foundation, AWS, GCP |
+| **Kvrocks** | 2.x | Apache 2.0 | Apache Foundation |
+| **Dragonfly** | 1.x | BSL 1.1 | Dragonfly DB |
+
+**Valkey 8.0** apporte : slots de hash améliorés, performances single-thread +40% via I/O threading, et un module VECTOR pour la recherche de similarité.
+
+---
+
+## 4. Bases de données vectorielles — Maturité et consolidation
+
+Le marché se consolide après l'explosion de 2023-2024.
+
+### pgvector 0.8+
+
+L'extension PostgreSQL pour vecteurs a franchi un cap décisif :
+- **HNSW indexing** stable et performant (ANN Benchmarks top-5)
+- **Quantisation binaire** (BQ) : compression 32× pour les vecteurs haute dimension
+- **Parallel HNSW build** : construction d'index parallélisée pour les grands datasets
+- Filtrage prédicatif intégré au parcours HNSW (évite le post-filtrage coûteux)
+
+### Convergence hybride
+
+La tendance dominante est d'ajouter la recherche vectorielle **dans les bases existantes** plutôt que de déployer un système dédié :
+
+- **Elasticsearch / OpenSearch** : vecteurs denses + BM25 en requête hybride native
+- **MongoDB Atlas Vector Search** : index HNSW intégrés aux collections existantes
+- **Qdrant 1.10+** : sparse vectors + dense vectors dans un seul index hybride (HNSW + SPLADE)
+- **SingleStore** : vecteurs dans tables relationnelles avec DOT_PRODUCT/EUCLIDEAN_DISTANCE natives
+
+### Benchmark BEIR / ANN 2025
+
+Les indices **HNSW quantifiés** dominent : recall@10 > 97% avec 4–8× moins de RAM qu'HNSW full-precision, rendant la recherche vectorielle viable à grande échelle sans GPU.
+
+---
+
+## 5. Data Lakehouse — Apache Iceberg v3 et la guerre des formats
+
+### Apache Iceberg v3
+
+La spec v3 (publiée fin 2024) ajoute :
+- **Row lineage** : traçabilité par ligne pour audit et RGPD (delete physique garanti)
+- **Variant type** : type semi-structuré natif pour JSON flexible sans schéma fixe
+- **Geometry type** : données géospatiales dans les tables Iceberg
+- **Default values** : valeurs par défaut au niveau colonne dans les métadonnées
+
+### Catalogs REST et interopérabilité
+
+Le standard **Iceberg REST Catalog** permet à n'importe quel moteur (Spark, Trino, DuckDB, Snowflake, BigQuery) de lire les mêmes tables. **Polaris Catalog** (Snowflake, open-sourcé) et **Unity Catalog** (Databricks) s'intègrent désormais nativement dans l'écosystème.
+
+---
+
+## 6. IA native dans les bases de données
+
+### Génération de requêtes (NL2SQL) — État de l'art 2025
+
+Les modèles NL2SQL ont atteint des performances remarquables sur le benchmark **BIRD** (~ 70–75% accuracy sur SQL complexe). Les intégrations production incluent :
+
+- **Snowflake Cortex Analyst** : génération de SQL analytique avec contexte métier (YAML sémantique)
+- **Google BigQuery Gemini** : assistance au debug de requêtes et génération d'insights automatiques
+- **Amazon Q in QuickSight** : requêtes en langage naturel sur RDS, Redshift, Aurora
+
+### Colonnes calculées par IA
+
+**Azure SQL Database** expérimente des colonnes dont la valeur est calculée par un modèle d'inférence embarqué (`AS (PREDICT MODEL=…)`) — permettant de scorer chaque ligne à l'insertion sans ETL externe.
+
+### Détection d'anomalies in-database
+
+**Oracle Autonomous Database** et **AlloyDB AI** intègrent des détecteurs d'anomalies temps réel sur les séries temporelles, directement dans le moteur SQL, sans export vers un service ML séparé.
+
+---
+
+## 7. Optimisation matérielle — GPU et FPGA
+
+### Bases de données GPU
+
+- **RAPIDS cuDF** (NVIDIA) : accélération GPU pour pandas-compatible dataframes, intégrable comme backend DuckDB/Spark
+- **HeavyDB (ex OmniSci)** : SQL analytique full-GPU, 100× plus rapide sur les agrégations columnar massives
+- **PGVECTO.RS** : extension PostgreSQL utilisant le GPU pour l'indexation HNSW (5–10× plus rapide à la construction)
+
+### CXL (Compute Express Link)
+
+L'émergence de **CXL 3.0** va permettre le partage de pools de mémoire entre nœuds — rendant possible une architecture « shared memory » sans les contraintes NUMA actuelles. Les premiers serveurs CXL 3.0 arrivent chez les hyperscalers en 2025-2026, avec des bases de données tirant parti du *memory pooling* (réduction des coûts RAM de 30-50%).
+
+---
+
+## 8. SQLite — Toujours indétrônable à l'edge
+
+### Extensions récentes
+
+| Extension | Fonctionnalité |
+|---|---|
+| **sqlite-vec** | Recherche vectorielle ANN dans SQLite |
+| **cr-sqlite** | CRDT pour synchronisation multi-maîtres (Turso) |
+| **libSQL** (Turso) | Fork SQLite avec réplication async et REST API |
+| **sqlite-xsv** | Lecture directe CSV/TSV comme tables virtuelles |
+
+### Cloudflare D1
+
+Cloudflare D1 (SQLite distribué à l'edge) est passé en GA fin 2024 avec :
+- Réplication read sur +300 edge locations
+- Transactions distribuées via DO (Durable Objects)
+- Time Travel : rollback point-in-time sur 30 jours
+
+---
+
+## 9. Observabilité avancée
+
+### OpenTelemetry + Databases
+
+Le standard **OpenTelemetry Semantic Conventions for Databases** (v1.20+) normalise les traces et métriques pour PostgreSQL, MySQL, MongoDB et Redis. Les spans incluent désormais le texte SQL sanitisé, le nombre de lignes affectées et le plan d'exécution résumé.
+
+### eBPF profiling en production
+
+**Pixie** (open-source, CNCF) et **Odigos** permettent d'injecter du profiling zero-instrumentation sur des bases containerisées via eBPF, capturant les requêtes lentes, les flamegraphs CPU et les latences réseau sans modifier le code applicatif.
+
+---
+
+## 10. Tendances émergentes Q2-Q3 2026
+
+| Tendance | Maturité | Signal |
+|---|---|---|
+| **AI-native databases** (ex: MotherDuck AI, Weaviate Generative) | Émergent | LLMs comme first-class citizens dans le query engine |
+| **Distributed SQLite** (Turso, D1, LibSQL) | En croissance | Edge computing, WASM |
+| **WASM UDFs** | Expérimental | Cloudflare Workers, SingleStore |
+| **CXL memory pooling** | Pré-prod | Hyperscalers H2 2026 |
+| **Iceberg REST Catalog** | Mature | Adoption universelle |
+| **Schéma-on-read JSON natif** (Variant type) | Croissance | Iceberg v3, DuckDB |
+
+---
+
+## Synthèse juin 2026
+
+Le paysage des bases de données se structure autour de **trois forces** :
+
+1. **Intelligence embarquée** : NL2SQL, ML in-database, détection d'anomalies autonome — la frontière entre base de données et pipeline ML s'efface.
+2. **Convergence des formats ouverts** : Apache Iceberg v3 + REST Catalog comme backbone universel ; DuckDB comme moteur de lecture universel.
+3. **Compute distribué vers le bas** : SQLite à l'edge (Turso, D1), WASM UDFs, CXL memory pooling — la puissance analytique descend vers la périphérie.
+
+> **À retenir** : PostgreSQL 18 AIO + DuckDB Iceberg + pgvector quantifié forment une stack open-source de référence capable de rivaliser avec des offres cloud managées pour 80% des cas d'usage.
+
+---
+
+*Rapport rédigé le 2026-06-15. Sources : PostgreSQL release notes, DuckDB changelog, Valkey GitHub, pgvector releases, Apache Iceberg spec, Cloudflare blog, NVIDIA RAPIDS docs, VLDB 2025 proceedings, DB-Engines ranking.*
+
+---
+
+
 # Actualité technique des bases de données — 2026-06-08
 
 ---
