@@ -1,3 +1,118 @@
+# Actualité technique des bases de données — 2026-06-29
+
+---
+
+## 1. PostgreSQL 18 — les grandes nouveautés
+
+### B-tree Skip Scans
+Le planificateur peut désormais exploiter les index multi-colonnes même si la colonne de tête n'apparaît pas dans la clause `WHERE`. Résultat : suppression de nombreux index redondants et économies de stockage significatives sur les grandes tables.
+
+### Virtual Generated Columns par défaut
+Les colonnes générées calculent maintenant leur valeur à la volée lors des lectures plutôt que de la stocker sur disque, réduisant l'empreinte physique des tables.
+
+### Checksums de données activés par défaut
+PostgreSQL 18 rend les checksums obligatoires à l'initialisation, détectant la corruption silencieuse de blocs sans configuration manuelle — un changement de philosophie opérationnelle majeur.
+
+### Async I/O et indexation vectorielle améliorés
+L'I/O asynchrone généralisé réduit les latences sur les workloads mixtes OLTP/vector. Les index HNSW pour `pgvector` bénéficient de ces optimisations, consolidant PostgreSQL comme plateforme unifiée pour les embeddings et les données transactionnelles.
+
+---
+
+## 2. MySQL 9.x — hyper-efficacité à l'échelle
+
+- **Parallel Read threads améliorés** : scan des grands tablespaces multi-cœurs, réduisant significativement le coût des full-table scans.
+- **Native VECTOR type** : les colonnes vectorielles sont désormais un type de premier niveau, prêt pour les workloads IA.
+- **Partial updates JSON** : les Innovation Releases 2026 affinent les mises à jour partielles de colonnes JSON (moins de write amplification).
+- **EXPLAIN ANALYZE enrichi** : diagnostic de bottlenecks (jointures inefficaces, table scans) avec une granularité inégalée.
+
+---
+
+## 3. Bases de données vectorielles — consolidation du marché
+
+RAG (Retrieval-Augmented Generation) est devenu le principal vecteur d'adoption en 2026.
+
+| Système | Évolution clé |
+|---|---|
+| **pgvectorscale** (Timescale) | 471 QPS à 99% recall sur 50 M vecteurs — 11,4× mieux que Qdrant |
+| **Pinecone** | BYOC (Bring Your Own Cloud) disponible sur AWS/GCP/Azure ; full-text search natif en preview ; Dedicated Read Nodes pour workloads read-heavy |
+| **Qdrant** | Filtrage payload in-graph ; hybrid search production-ready ; edge sur les filtres sélectifs sur grandes collections |
+| **Milvus** | GPU acceleration mature, ciblant les déploiements enterprise à très grande échelle |
+
+**Tendance** : pour la majorité des équipes, `pgvector` + PostgreSQL reste le choix dominant jusqu'à ~50 M vecteurs — il évite la complexité opérationnelle d'un système dédié.
+
+---
+
+## 4. Cloud & Serverless — nouvelles annonces
+
+### AWS Aurora Serverless v3 (20 avril 2026)
+Scaling 30 % plus rapide, facturation à la milliseconde, et réduction du cold-start pour les workloads à forte variabilité.
+
+### Google Cloud Next'26
+AlloyDB a reçu des améliorations de son column store adaptatif et une intégration renforcée avec Vertex AI pour les requêtes vectorielles hybrides directement en SQL.
+
+### ClickHouse — MongoDB CDC en Public Beta
+Le connecteur ClickPipes MongoDB CDC supporte désormais les sharded clusters et Amazon DocumentDB — synchronisation temps réel vers ClickHouse pour les pipelines analytiques sur données opérationnelles MongoDB.
+
+### Marché cloud databases
+Le marché est estimé à **27 Md$ en 2026**, projeté à **110 Md$ en 2035** (CAGR 16,8 %). Le multi-model (JSON + Graph + Vector + Relationnel dans un seul moteur) devient le critère de sélection n°1 pour réduire la fatigue "polyglot persistence".
+
+---
+
+## 5. Optimisation : nouvelles techniques consolidées
+
+### AI-driven auto-indexing
+Azure SQL, AlloyDB et Oracle Autonomous Database utilisent des modèles ML embarqués pour recommander et créer automatiquement des index (partiels, couvrants, BRIN) basés sur les patterns d'accès observés — sans intervention DBA.
+
+### Query Plan Management (QPM) & EXPLAIN ANALYZE
+PostgreSQL 18 QPM + MySQL 9.x EXPLAIN ANALYZE fournissent des insights en temps réel sur les plans d'exécution. Identification des N+1 patterns, mauvaises estimations de cardinalité et jointures coûteuses sans instrumentation externe.
+
+### Index composites intelligents
+Les stratégies d'indexation composite `(customer_id, order_date)` ou `(created_at, status)` deviennent le pattern standard recommandé par les outils d'auto-tuning pour les requêtes OLTP typiques.
+
+### Autonomous databases
+Oracle Autonomous Database et Azure SQL Edge réduisent le tuning manuel grâce à des boucles feedback IA qui ajustent les paramètres moteur (mémoire, parallélisme, cache) dynamiquement en fonction de la charge.
+
+---
+
+## 6. DuckDB — "warehouse in your app"
+
+DuckDB consolide sa position de moteur analytique embarqué avec :
+- LTS lines stables pour les déploiements production
+- Transaction isolation controls affinés
+- Amélioration de l'import de données et de la précision des agrégations
+- Intégration renforcée avec Apache Iceberg et Delta Lake via extensions officielles
+
+---
+
+## 7. Tendances à surveiller (horizon Q3-Q4 2026)
+
+1. **NewSQL distribué** : CockroachDB et AlloyDB résolvent enfin le problème de consistency globale à grande échelle — projection CAGR 29,7 % pour ces architectures.
+2. **Multi-model unifié** : ArangoDB, SurrealDB, FerretDB ciblent le remplacement de 3-5 bases spécialisées par une seule instance.
+3. **ClickHouse pour l'observabilité** : devient le standard de facto pour stocker métriques, logs et traces à l'échelle (telemetry pattern).
+4. **HTAP sans ETL** : TiDB 8.x, AlloyDB et SingleStore rendent caducs les pipelines ETL pour l'analytique temps réel sur données opérationnelles.
+5. **Edge SQL** : Cloudflare D1 et Turso (libSQL distribué) apportent le SQL répliqué à la périphérie pour des applications sub-10 ms globalement.
+
+---
+
+## Synthèse juin 2026
+
+| Axe | Signal fort |
+|---|---|
+| PostgreSQL 18 | Skip Scans, checksums par défaut, async I/O |
+| Vectoriel | pgvectorscale domine < 50 M vecteurs ; Pinecone BYOC en GA |
+| Cloud | Aurora Serverless +30 % scaling ; AlloyDB Next'26 |
+| Analytique | ClickHouse MongoDB CDC ; DuckDB LTS |
+| Auto-tuning | AI-driven indexing généralisé (Azure, AlloyDB, Oracle) |
+| Marché | 27 Md$ → 110 Md$ d'ici 2035 ; multi-model comme critère #1 |
+
+> En juin 2026, la frontière entre OLTP, OLAP et Vector DB continue de s'effacer. PostgreSQL 18 illustre parfaitement cette convergence : un seul moteur pour les transactions, l'analytique légère et les embeddings IA, avec une opérabilité renforcée par défaut.
+
+---
+
+*Rapport rédigé le 2026-06-29 — Sources : release notes PostgreSQL 18, MySQL 9.x, ClickHouse Blog, Timescale pgvectorscale benchmarks, Google Cloud Next'26, AWS Aurora changelog, DataCamp vector DB comparison, MarkTechPost, Medium/CodeToDeploy.*
+
+---
+
 # Actualité technique des bases de données — 2026-05-19
 
 ---
