@@ -1,3 +1,80 @@
+# Actualité technique des bases de données — 2026-07-06
+
+---
+
+## 1. PostgreSQL 18 passe en maintenance (18.1 → 18.4)
+
+Après la GA couverte dans le rapport du 29 juin, PostgreSQL 18 a déjà reçu plusieurs releases de maintenance (18.1, 18.2, 18.3, 18.4), confirmant la stabilité rapide de la version. Un correctif groupé notable est également sorti pour les branches précédentes (**18.3, 17.9, 16.13, 15.17, 14.22**), signe d'un cycle de support toujours actif sur 5 versions majeures en parallèle.
+
+Source : [PostgreSQL 18.3, 17.9, 16.13, 15.17, and 14.22 Released!](https://www.postgresql.org/about/news/postgresql-183-179-1613-1517-and-1422-released-3246/)
+
+---
+
+## 2. Consolidation du marché autour de Postgres : la bataille des agents IA
+
+Deux acquisitions coup sur coup rebattent les cartes de l'écosystème Postgres géré, avec un angle commun : préparer l'infrastructure de données pour les agents IA autonomes.
+
+- **Snowflake acquiert Crunchy Data** (~250 M$) pour lancer *Snowflake Postgres*, positionné sur l'enterprise-readiness, la gouvernance et l'intégration dans l'AI Data Cloud.
+- **Databricks réplique trois semaines plus tard en acquérant Neon** (~1 Md$) — déjà couvert dans nos rapports précédents comme pionnier du « database branching » — pour un Postgres serverless cloud-native taillé pour le développement d'agents IA et les transactions à faible latence.
+
+Les deux plateformes parient sur PostgreSQL comme brique de mémoire/état transactionnel pour les agents autonomes plutôt que sur une base propriétaire. **Impact attendu :** pression accrue sur les fournisseurs de Postgres managé indépendants (Supabase, Timescale, EDB) et accélération des features orientées branching, scale-to-zero et intégration LLM chez tous les acteurs du secteur.
+
+Sources : [Snowflake acquires Crunchy Data (InfoWorld)](https://www.infoworld.com/article/4001149/snowflake-acquires-crunchy-data-for-enterprise-grade-postgresql-to-counter-databricks-neon-buy.html), [Snowflake Buys Crunchy Data for $250m, Databricks Buys Neon for $1B (SaaStr)](https://www.saastr.com/snowflake-buys-crunchy-data-for-250m-databricks-buys-neon-for-1b-the-new-ai-database-battle/)
+
+---
+
+## 3. Bases vectorielles : du produit dédié au simple type de donnée
+
+Le narratif continue d'évoluer par rapport aux benchmarks pgvectorscale/Pinecone/Qdrant couverts le 29 juin : le vecteur est de plus en plus traité comme **un type de donnée parmi d'autres** plutôt qu'une catégorie de base à part entière.
+
+- **Architecture « polystore »** : recherche vectorielle et stockage relationnel coexistent avec des frontières claires — devenu le standard par défaut pour les produits AI-augmentés en 2026, alors qu'il était encore expérimental il y a un an.
+- **Qdrant Cloud** ajoute l'indexation accélérée GPU, les clusters multi-AZ et l'audit logging à son offre enterprise.
+- **Actian VectorAI DB** (nouvel entrant) revendique une recherche vectorielle jusqu'à 22× plus rapide que la concurrence.
+- **Cohere Embed v4 Multimodal** : premier modèle d'embedding capable de vectoriser texte, images et documents entrelacés dans un même espace vectoriel.
+- **Databricks** renomme sa fonctionnalité « Vector Search » en **AI Search** et permet désormais des index de recherche plein texte sans aucun vecteur/embedding — la frontière recherche vectorielle / recherche lexicale continue de s'estomper.
+
+**Impact :** les équipes produit doivent réévaluer si une base vectorielle dédiée est encore justifiée, ou si l'extension vectorielle de leur base existante (déjà très mature, cf. pgvectorscale) suffit désormais.
+
+Sources : [Vector Databases 2026: Trends and New Players](https://app.ailog.fr/en/blog/news/vector-database-trends-2026), [Best Vector Databases in 2026 (MarkTechPost)](https://www.marktechpost.com/2026/05/10/best-vector-databases-in-2026-pricing-scale-limits-and-architecture-tradeoffs-across-nine-leading-systems/), [Qdrant Cloud launches high-performance vector database features (SiliconANGLE)](https://siliconangle.com/2026/04/28/qdrant-cloud-launches-high-performance-vector-database-features-ai-workloads/), [Actian Launches VectorAI DB (HPCwire)](https://www.hpcwire.com/bigdatawire/2026/04/29/actian-launches-vectorai-db-claims-22x-faster-vector-search/)
+
+---
+
+## 4. MCP (Model Context Protocol) : le nouveau standard d'accès agentique aux bases
+
+**Google Cloud** déploie un support MCP managé et distant pour AlloyDB, Spanner, Cloud SQL, Bigtable et Firestore — les agents IA peuvent désormais interroger et administrer ces bases via un protocole standardisé plutôt que via des intégrations ad-hoc.
+
+En parallèle :
+- **Firestore** est repensé en profondeur pour l'édition Enterprise : opérations en pipeline, plus d'une centaine de nouvelles fonctionnalités de requête, requêtes sans index (« index-less ») et nouveaux types d'index.
+- **BigQuery Studio** reçoit un assistant Gemini renforcé pour l'aide à la requête et la détection d'anomalies.
+- **Databricks Model Serving** ajoute **Claude Sonnet 5** comme modèle hébergé, accessible via les Foundation Model APIs — utile pour les workflows agentiques adossés aux données Databricks/Unity Catalog.
+- **Oracle** poursuit l'extension de son Autonomous AI Database (Exadata) : contrôles administratifs supplémentaires et clés gérées par le client via AWS KMS pour Cross-region Data Guard.
+
+**Impact :** MCP s'impose progressivement comme l'interface standard entre agents IA et bases de données managées, au même titre que SQL entre applications et bases relationnelles — une tendance à suivre de près chez AWS et Azure dans les mois qui viennent.
+
+Sources : [What's new with Google Data Cloud](https://cloud.google.com/blog/products/data-analytics/whats-new-with-google-data-cloud), [Oracle Database Monthly News – June 2026](https://blogs.oracle.com/coretec/oracle-database-monthly-news-june-2026-quick-links), [Databricks release notes – June 2026](https://docs.databricks.com/aws/en/release-notes/product/2026/june)
+
+---
+
+## Synthèse (delta depuis le 29 juin)
+
+| Axe | Signal fort |
+|---|---|
+| PostgreSQL | GA stabilisée (18.1-18.4), support actif sur 5 versions majeures |
+| M&A | Snowflake/Crunchy Data (250 M$), Databricks/Neon (1 Md$) — bataille Postgres pour l'IA agentique |
+| Vectoriel | Consolidation : le vecteur devient un type de donnée, plus une catégorie de base à part |
+| Agentique | MCP managé sur Google Cloud (AlloyDB, Spanner, Cloud SQL, Bigtable, Firestore) |
+| Écosystème | Firestore réinventé, Claude Sonnet 5 sur Databricks, Oracle Autonomous AI Database étendu |
+
+> En une semaine, l'actualité bascule nettement vers la bataille commerciale pour l'infrastructure des agents IA : PostgreSQL devient le terrain d'affrontement entre Snowflake et Databricks, pendant que Google Cloud pose les premiers jalons de MCP comme protocole d'accès agentique standard aux bases de données managées.
+
+---
+
+*Rapport rédigé le 2026-07-06 — Sources : release notes officielles PostgreSQL ; blogs techniques Google Cloud, Oracle, Databricks, Qdrant ; presse spécialisée InfoWorld, SaaStr, SiliconANGLE, HPCwire, MarkTechPost.*
+
+---
+
+---
+
 # Actualité technique des bases de données — 2026-06-29
 
 ---
