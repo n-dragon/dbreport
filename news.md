@@ -1,3 +1,79 @@
+# Actualité technique des bases de données — 2026-07-13
+
+---
+
+## 1. PostgreSQL 19 Beta 1 : les requêtes de graphe entrent dans le moteur
+
+Publiée début juin, la première bêta de **PostgreSQL 19** (GA visée fin 2026) marque une étape majeure : elle implémente **SQL/PGQ** (SQL:2023), permettant d'exposer des tables relationnelles existantes comme un **property graph** et de les interroger avec une syntaxe de pattern-matching, sans migrer vers une base de graphe dédiée.
+
+- **SQL/PGQ** : les graphes sont définis comme des vues sur des tables déjà en place ; la version initiale couvre le pattern-matching à profondeur fixe (le chemin de longueur variable est prévu pour une version ultérieure).
+- **REPACK** : nouvelle commande de réorganisation de table **concurrente**, qui récupère l'espace disque sans verrou exclusif prolongé (successeur de `VACUUM FULL`/`pg_repack` intégré au cœur).
+- **Autovacuum parallèle**, `GROUP BY ALL`, sortie JSON native pour `COPY TO`, et extension du support temporel (`FOR PORTION OF` sur `UPDATE`/`DELETE`).
+
+**Impact :** en internalisant les requêtes de graphe, Postgres grignote un cas d'usage encore réservé à Neo4j ou Amazon Neptune — dans la continuité de sa stratégie « une base pour (presque) tout » déjà observée sur le vectoriel.
+
+Sources : [PostgreSQL 19 Beta 1 Released!](https://www.postgresql.org/about/news/postgresql-19-beta-1-released-3313/), [PostgreSQL 19 Beta Introduces SQL Graph Queries and Concurrent Table Repacking (InfoQ)](https://www.infoq.com/news/2026/06/postgresql-19-graph-queries/), [PostgreSQL 19 New Features (Neon)](https://neon.com/postgresql/postgresql-19-new-features)
+
+---
+
+## 2. Sécurité : Oracle passe au correctif mensuel face aux menaces assistées par IA
+
+**Oracle** a démarré en mai un rythme de **Critical Security Patch Update (CSPU) mensuel**, en complément de ses CPU trimestrielles historiques (troisième mardi de janvier/avril/**juillet**/octobre — prochaine échéance le 21 juillet). L'éditeur justifie explicitement ce changement par l'accélération des attaques automatisées/assistées par IA, qui réduit le délai entre divulgation et exploitation.
+
+En parallèle, la vulnérabilité critique **CVE-2026-49261** (CVSS 10, RCE via `wsrep_notify_cmd` sur les clusters Galera) continue de circuler activement sur les déploiements **MariaDB** non patchés (10.6–12.3) — un rappel que les composants de clustering restent une surface d'attaque sous-surveillée par rapport au moteur SQL lui-même.
+
+**Impact :** le cycle mensuel côté Oracle (déjà adopté par SAP et Microsoft) devient la norme du secteur ; attendez-vous à une pression similaire sur les autres éditeurs de bases d'entreprise.
+
+Sources : [Oracle will patch more often to counter AI cybersecurity threat (InfoWorld)](https://www.infoworld.com/article/4167338/oracle-will-patch-more-often-to-counter-ai-cybersecurity-threat-3.html), [Update: Monthly CSPUs Begin May 28, 2026 (Oracle)](https://blogs.oracle.com/security/update-monthly-critical-security-patch-updates-cspus-begin-may-28-2026), [MariaDB Critical RCE via wsrep_notify_cmd (CVE-2026-49261)](https://www.thehackerwire.com/mariadb-critical-rce-via-wsrep_notify_cmd-cve-2026-49261/)
+
+---
+
+## 3. Vectoriel : AWS S3 Vectors passe en GA pendant que Pinecone chercherait un repreneur
+
+Le mouvement de « commoditisation » du vectoriel identifié la semaine dernière se confirme par deux signaux opposés :
+
+- **Amazon S3 Vectors** atteint la disponibilité générale avec une architecture **« storage-first »** : capacité par index portée à **2 milliards de vecteurs** (×40) et un coût total de possession réduit jusqu'à **90 %** pour les charges RAG à grande échelle, en traitant le vecteur comme un objet de stockage plutôt qu'un moteur de calcul dédié.
+- À l'inverse, **Pinecone** — pionnier du vectoriel managé — explorerait une vente, sous la pression d'un **churn client** motivé par le coût, alors que les bases généralistes (pgvector, MongoDB Atlas Vector Search, Oracle 26ai) absorbent une part croissante des cas d'usage standards.
+
+**Impact :** le marché se polarise entre stockage vectoriel « commodity » à bas coût (S3 Vectors, extensions intégrées) et outils spécialisés haute performance pour les besoins exigeants — le milieu de marché (Pinecone historique) est le plus exposé.
+
+Sources : [Amazon S3 Vectors Reaches GA (InfoQ)](https://www.infoq.com/news/2026/01/aws-s3-vectors-ga/), [Do You Still Need a Vector Database in 2026?](https://medium.com/data-science-collective/vector-databases-are-dying-heres-the-production-evidence-8c17b54687e2), [Top 9 Vector Databases as of July 2026 (Shakudo)](https://www.shakudo.io/blog/top-9-vector-databases)
+
+---
+
+## 4. Databricks élargit son catalogue de modèles hébergés et pousse l'ingestion CDC
+
+Les notes de version de juillet de **Databricks** confirment l'accélération de l'intégration IA + données :
+
+- **Gemini 3 Pro Image** et **Gemini 3.1 Flash Image** rejoignent Claude Sonnet 5 (déjà annoncé fin juin) comme modèles hébergés via les Foundation Model APIs, adossés à Unity Catalog.
+- **Lakeflow Connect — row filtering** passe en disponibilité générale, pour restreindre l'ingestion à des sous-ensembles de lignes dès la source.
+- Un **pipeline CDC intégré pour MySQL** entre en bêta, complétant l'offre CDC déjà disponible pour Postgres et SQL Server.
+
+Rappel de contexte (M&A de la semaine dernière) : Databricks (Neon) et Snowflake (Crunchy Data) avancent chacun leurs intégrations Postgres respectives, sans annonce produit majeure supplémentaire cette semaine.
+
+**Impact :** la bataille des plateformes data+IA se joue désormais autant sur la largeur du catalogue de modèles hébergés et la simplicité de l'ingestion CDC que sur la performance brute du moteur de requête.
+
+Sources : [Databricks Release Hub](https://databricksreleasehub.com/), [June 2026 — Databricks on AWS release notes](https://docs.databricks.com/aws/en/release-notes/product/2026/june)
+
+---
+
+## Synthèse (delta depuis le 6 juillet)
+
+| Axe | Signal fort |
+|---|---|
+| PostgreSQL | Beta 1 de la version 19 : SQL/PGQ (graphes natifs), commande REPACK, autovacuum parallèle |
+| Sécurité | Oracle bascule en correctifs mensuels (CSPU) contre les menaces IA ; RCE critique MariaDB (Galera) toujours active |
+| Vectoriel | AWS S3 Vectors en GA (storage-first, -90 % TCO) vs Pinecone en risque de cession — polarisation du marché |
+| Écosystème IA | Databricks ajoute Gemini 3 Pro/3.1 Flash Image comme modèles hébergés, CDC MySQL en bêta |
+
+> La semaine confirme deux tendances de fond : Postgres continue d'absorber des catégories entières (graphe après vectoriel) plutôt que de laisser émerger des concurrents spécialisés, et la sécurité redevient un sujet opérationnel de premier plan — Oracle resserrant son cycle de correctifs pour suivre le rythme des attaques assistées par IA.
+
+---
+
+*Rapport rédigé le 2026-07-13 — Sources : release notes officielles PostgreSQL et Oracle ; blogs techniques AWS, Databricks ; presse spécialisée InfoQ, InfoWorld, TheHackerWire, Shakudo.*
+
+---
+
 # Actualité technique des bases de données — 2026-07-06
 
 ---
