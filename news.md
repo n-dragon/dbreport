@@ -1,3 +1,80 @@
+# Actualité technique des bases de données — 2026-07-27
+
+---
+
+## 1. PostgreSQL 19 Beta 2 : feature freeze, REPACK unifié et graphes natifs confirmés
+
+Publiée le 16 juillet, la **Beta 2** de PostgreSQL 19 acte le **feature freeze** de la version (GA visée septembre/octobre 2026) et consolide les nouveautés annoncées en Beta 1 :
+
+- **REPACK** devient une commande de **consolidation unifiée**, qui remplace à la fois `VACUUM FULL` et `CLUSTER` pour la réorganisation de table sans verrou exclusif prolongé.
+- **SQL/PGQ** : les mots-clés `GRAPH_TABLE` et `CREATE PROPERTY GRAPH` sont désormais figés dans le moteur, avec plusieurs correctifs de stabilité sur le pattern-matching depuis la Beta 1.
+- Changements de configuration par défaut : l'alerte précoce de wraparound d'ID de transaction se déclenche désormais sous **100 millions** de transactions restantes (contre 40 millions), et `log_lock_waits` est activé par défaut pour mieux diagnostiquer la contention de verrous.
+
+**Impact :** le feature freeze signale que le périmètre de la 19 (graphes, REPACK, autovacuum parallèle) est désormais stable — les équipes qui évaluaient une migration peuvent commencer les tests de compatibilité sans craindre de changement de cap avant la GA.
+
+Sources : [PostgreSQL 19 Beta 2 Released!](https://www.postgresql.org/about/news/postgresql-19-beta-2-released-3350/), [PostgreSQL 19 Beta 2 Released: Native Graph Queries, Unified REPACK and Feature Freeze](https://www.linuxcompatible.org/story/postgresql-19-beta-2-released-native-graph-queries-unified-repack-and-feature-freeze)
+
+---
+
+## 2. Oracle CPU juillet 2026 : 447 CVE dont 10 critiques, NoSQL Database touché
+
+Le **Critical Patch Update (CPU)** trimestriel d'Oracle, publié le 21 juillet, corrige **447 CVE** sur l'ensemble du catalogue, dont **10 vulnérabilités critiques** — 6 exploitables à distance sans authentification. Côté bases de données :
+
+- **Oracle NoSQL Database** reçoit un nouveau correctif de sécurité, aux côtés de **15 correctifs** pour les produits Oracle Database.
+- **Oracle Coherence** (composant core de Fusion Middleware) et **Oracle APEX** (3 correctifs) figurent également au menu.
+- Répartition par type : RCE (22 %), déni de service (22 %), contournement d'autorisation (13 %), élévation de privilèges (9 %), contournement d'authentification (9 %).
+
+**Impact :** ce CPU confirme le rythme désormais mensuel évoqué début juillet (CSPU) en complément du trimestriel — les administrateurs Oracle NoSQL et Coherence doivent traiter ce correctif en priorité vu la part de vulnérabilités exploitables sans authentification.
+
+Sources : [Oracle Critical Patch Update Advisory - July 2026](https://www.oracle.com/security-alerts/cpujul2026.html), [Oracle CPU juillet 2026 : 10 vulnérabilités critiques parmi 447 CVE (Feedly)](https://feedly.com/cve/security-advisories/oracle/2026-07-21-oracle-critical-patch-update-advisory-july-2026-10-critical-vulnerabilities-amid-447-cves)
+
+---
+
+## 3. OLAP temps réel : Regatta unifie OLTP/OLAP/vectoriel, ClickHouse creuse l'écart coût sur Snowflake
+
+Deux signaux illustrent la compétition croissante sur l'analytique temps réel :
+
+- **RegattaDB** atteint la disponibilité générale : une base SQL distribuée qui unifie charges **transactionnelles (OLTP), analytiques (OLAP) et vectorielles**, positionnée comme remplacement direct de Postgres.
+- **CostBench**, un benchmark de coût de bout en bout mené par ClickHouse (ingestion continue, fraîcheur, exécution de requêtes sur 28 h), montre que **ClickHouse Cloud** obtient un meilleur rapport coût/performance que **Snowflake Interactive Tables**, ce dernier nécessitant un entrepôt de rafraîchissement tournant en continu pour maintenir ses données pré-agrégées à jour.
+- En parallèle, **DuckDB** franchit le cap du **million de téléchargements hebdomadaires sur PyPI**, confirmant l'adoption du moteur analytique embarqué « zero-config ».
+
+**Impact :** la pression sur les entrepôts cloud facturés au compute continue de s'intensifier — les moteurs OLAP « lean » (ClickHouse, DuckDB) et les bases unifiées multi-workload (RegattaDB) grignotent le terrain sur les charges interactives, là où Snowflake/Databricks restent mieux positionnés sur les gros batchs soutenus.
+
+Sources : [Regatta launches its unified OLTP, OLAP and vector database (Blocks & Files)](https://www.blocksandfiles.com/data-management/2026/07/15/regatta-launches-its-unified-oltp-olap-and-vector-database/5271769), [ClickHouse — July 2026 newsletter](https://clickhouse.com/blog/202607-newsletter)
+
+---
+
+## 4. MySQL ouvre sa gouvernance communautaire et livre la 9.7 LTS
+
+Oracle poursuit l'ouverture de l'écosystème **MySQL** amorcée fin juin :
+
+- Le **MySQL Community Governance Model**, annoncé le 25 juin, formalise un cadre de collaboration et de prise de décision pour le projet.
+- Le processus de gestion des **bugs** s'ouvre pour plus de transparence côté communauté.
+- **MySQL 9.7 LTS** devient la dernière version à support long terme disponible.
+
+**Impact :** après des années de gouvernance fermée critiquées par la communauté (forks MariaDB, Percona Server), ce geste d'ouverture — même partiel — pourrait réduire la fragmentation de l'écosystème MySQL, sans toutefois égaler le modèle de gouvernance de la Fondation PostgreSQL.
+
+Sources : [MySQL :: MySQL News Announcements](https://www.mysql.com/news-and-events/), [Is Oracle Finally Killing MySQL? (Percona)](https://www.percona.com/blog/is-oracle-finally-killing-mysql/)
+
+---
+
+## Synthèse (delta depuis le 13 juillet)
+
+| Axe | Signal fort |
+|---|---|
+| PostgreSQL | Beta 2 de la v19 : feature freeze, REPACK unifié (remplace VACUUM FULL/CLUSTER), graphes SQL/PGQ figés |
+| Sécurité | CPU Oracle juillet : 447 CVE dont 10 critiques ; Oracle NoSQL Database et Coherence touchés |
+| OLAP / temps réel | RegattaDB (OLTP+OLAP+vectoriel) en GA ; ClickHouse bat Snowflake Interactive Tables sur le coût (CostBench) ; DuckDB > 1M téléchargements/semaine |
+| MySQL | Gouvernance communautaire formalisée, bug tracker ouvert, MySQL 9.7 LTS |
+
+> La semaine confirme la consolidation de Postgres 19 (le périmètre est désormais gelé) et une bataille de plus en plus frontale sur le coût réel de l'analytique temps réel, où les moteurs « lean » open source (ClickHouse, DuckDB, RegattaDB) challengent directement les entrepôts cloud historiques sur leur terrain de prédilection : le rapport coût/performance.
+
+---
+
+*Rapport rédigé le 2026-07-27 — Sources : release notes officielles PostgreSQL et Oracle ; blog ClickHouse ; presse spécialisée Feedly, Blocks & Files, LinuxCompatible, Percona.*
+
+---
+
 # Actualité technique des bases de données — 2026-07-13
 
 ---
