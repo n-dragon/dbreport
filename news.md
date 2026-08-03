@@ -1,3 +1,80 @@
+# Actualité technique des bases de données — 2026-08-03
+
+---
+
+## 1. OLAP : PostHog quitte le cluster ClickHouse partagé pour du DuckDB single-tenant ; DuckDB 2.0 confirmé pour l'automne
+
+PostHog a publié le détail de la refonte complète de son entrepôt de données analytique : chaque organisation dispose désormais de sa **propre instance DuckDB single-tenant**, exposée via le **protocole Postgres Wire** (compatible `psql`, dbt, et tout outil BI standard), en remplacement du cluster ClickHouse partagé historique.
+
+- Le changement lève les limites de multi-tenancy qui empêchaient d'exposer des connexions directes au cluster ClickHouse, tout en permettant l'usage de **dbt** pour la modélisation des données selon les bonnes pratiques du secteur.
+- **DuckHog**, une extension DuckDB développée par PostHog, permet de rapatrier un sous-ensemble de données en local (pandas, polars ou DuckDB) pour l'itération rapide d'agents IA, puis de réécrire les résultats dans l'entrepôt — un pattern jugé mieux adapté aux workflows agentiques que l'envoi systématique des requêtes vers un cluster distant.
+- En parallèle, DuckDB confirme sa feuille de route « DuckDB comme serveur » : la version **2.0**, attendue à l'automne 2026, apportera l'**E/S asynchrone** (accélération DuckLake et lecture/écriture S3), des **triggers** pour l'automatisation, et des requêtes conscientes du partitionnement pour la scalabilité à grande échelle.
+
+**Impact :** ce choix illustre un pattern émergent — remplacer un cluster analytique mutualisé par de multiples instances embarquées single-tenant — porté par la montée des workflows d'agents IA qui ont besoin d'un accès local rapide aux données plutôt que d'un accès distant partagé.
+
+Sources : [DuckDB vs ClickHouse: Why we use both at PostHog](https://posthog.com/blog/duckdb-vs-clickhouse), [Why we rebuilt our data warehouse and how it unlocks self-driving products (PostHog)](https://posthog.com/blog/why-we-rebuilt-our-data-warehouse), [DuckDB 1.5.4 Released: Stability Enhancements and v2.0.0 Preview](https://duckdblab.org/en/post/duckdb-upcoming-v2-roadmap-preview/)
+
+---
+
+## 2. Sécurité : CVE-2026-61211 (CVSS 9.9) permet une prise de contrôle totale de l'instance Oracle Database via DBMS_CLOUD
+
+Publiée dans le cadre du CPU de juillet — un record de **1 449 correctifs pour 1 235 CVE uniques** — la vulnérabilité **CVE-2026-61211** touche le composant RDBMS d'Oracle Database (versions **19.3–19.31** et **23.4.0–23.26.2**).
+
+- Un attaquant disposant simplement du privilège **EXECUTE sur le package DBMS_CLOUD** peut, via Oracle Net, obtenir une **prise de contrôle complète de l'instance RDBMS** (confidentialité, intégrité, disponibilité) — avec un changement de portée (« scope change ») qui peut affecter des composants situés hors de la base.
+- Remédiation recommandée : inventorier tous les comptes disposant de `EXECUTE ON DBMS_CLOUD` et révoquer ce privilège quand il n'est pas strictement nécessaire, restreindre l'exposition du listener Oracle Net aux seules couches applicatives de confiance, et faire tourner les identifiants des comptes concernés après application du correctif.
+- Ce CPU de juillet reste, plus largement, dominé par **Oracle E-Business Suite** (410 correctifs, 28 % du total) et compte **261 vulnérabilités critiques** sur l'ensemble du catalogue.
+
+**Impact :** un privilège applicatif courant, utilisé pour l'intégration cloud native d'Oracle Database, devient un vecteur de compromission totale de la RDBMS — les équipes doivent traiter l'audit des privilèges DBMS_CLOUD en priorité, indépendamment du calendrier habituel de déploiement des CPU trimestriels.
+
+Sources : [CVE-2026-61211: Oracle Database RDBMS Privilege Escalation (SentinelOne)](https://www.sentinelone.com/vulnerability-database/cve-2026-61211/), [Oracle July 2026 CPU: 1,449 Patches, 10 Score Max (SOCRadar)](https://socradar.io/blog/oracle-july-2026-cpu-1449-patches/), [CVE-2026-61211 · GitHub Advisory Database](https://github.com/advisories/GHSA-fjrp-xwpc-qq2f)
+
+---
+
+## 3. Cache clé-valeur : Valkey consolide son avance sur Redis
+
+Le fork communautaire **Valkey**, sous gouvernance Linux Foundation, continue de gagner du terrain sur Redis dans l'écosystème du cache :
+
+- **Harbor v2.15.2** remplace Redis par Valkey comme backend de cache interne, un nouveau cas d'adoption dans la chaîne d'outils cloud-native.
+- **Valkey 9.1** apporte des améliorations d'efficacité mémoire, mises en avant par l'équipe Percona qui positionne Valkey comme complément haute performance aux bases relationnelles pour le caching.
+- Depuis octobre 2025, **Valkey 9** revendique une capacité de plus d'**un milliard de requêtes par seconde** et s'est imposé comme option par défaut dans plusieurs services de cache managés.
+
+**Impact :** le fork né de la controverse sur la licence Redis (2024) n'est plus une simple alternative de repli : il s'installe comme choix par défaut dans des projets tiers (Harbor) et dans les offres managées, accentuant la pression sur Redis Inc. pour regagner la confiance de la communauté open source.
+
+Sources : [Valkey · Blog](https://valkey.io/blog/), [Valkey 9 After 18 Months: How the Redis Fork Is Reshaping the Cloud Cache Landscape](https://www.cloudmagazin.com/en/2026/04/10/valkey-9-redis-fork-cloud-cache-landscape/), [Choosing the Right Key-Value Store: Redis vs Valkey (Percona)](https://www.percona.com/blog/choosing-the-right-key-value-store-redis-vs-valkey/)
+
+---
+
+## 4. Vectoriel / IA : MongoDB internalise embeddings contextuels et reranking natif sur Atlas
+
+MongoDB continue d'enrichir Atlas pour les charges RAG et agentiques :
+
+- **voyage-context-4**, nouveau modèle d'embedding contextualisé par chunk (disponible depuis le 1er juillet), produit un vecteur par chunk qui capture le contexte complet du document, avec un nouveau backbone mixture-of-experts, un auto-chunking intégré et un support natif du chevauchement de chunks.
+- Le **reranking natif (`$rerank`)** sur Atlas entre en preview publique, permettant d'améliorer la précision de la recherche en s'appuyant directement sur le reranking Voyage AI, sans pipeline externe à orchestrer.
+- Ces annonces s'inscrivent dans la continuité de la stratégie « Enterprise AI production ready » de MongoDB, centrée sur les opérations d'agents IA à grande échelle.
+
+**Impact :** MongoDB cherche à internaliser toute la chaîne RAG (embedding + stockage vectoriel + reranking) directement dans Atlas, réduisant la nécessité d'orchestrer des services tiers (Pinecone, Voyage standalone) — une tendance cohérente avec la commoditisation du vectoriel déjà observée mi-2026.
+
+Sources : [New in MongoDB](https://www.mongodb.com/products/updates/), [MongoDB adds new vector, performance capabilities to aid AI (TechTarget)](https://www.techtarget.com/searchdatamanagement/news/366642768/MongoDB-adds-new-vector-performance-capabilities-to-aid-AI), [MongoDB Makes Enterprise AI Production Ready](https://www.prnewswire.com/news-releases/mongodb-makes-enterprise-ai-production-ready-302764870.html)
+
+---
+
+## Synthèse (delta depuis le 27 juillet)
+
+| Axe | Signal fort |
+|---|---|
+| OLAP / architecture | PostHog quitte le cluster ClickHouse partagé pour du DuckDB single-tenant par organisation (protocole Postgres Wire) ; DuckDB 2.0 (E/S async, triggers, partition-aware) confirmé pour l'automne |
+| Sécurité | CVE-2026-61211 (CVSS 9.9) : un simple privilège DBMS_CLOUD permet une prise de contrôle totale d'une instance Oracle Database |
+| Cache / clé-valeur | Valkey grignote Redis : adoption par Harbor, gains mémoire en 9.1, plus d'1 Md req/s depuis oct. 2025 |
+| Vectoriel / IA | MongoDB Atlas internalise les embeddings contextuels (voyage-context-4) et le reranking natif (`$rerank`) |
+
+> La semaine marque un tournant architectural côté OLAP — le passage d'un cluster mutualisé (ClickHouse) à des instances embarquées single-tenant (DuckDB) chez un acteur en forte croissance comme PostHog — pendant que la sécurité Oracle reste dominée par un privilège cloud mal maîtrisé (DBMS_CLOUD) plutôt que par une faille du moteur SQL lui-même. En toile de fond, la consolidation continue sur deux fronts : le cache (Valkey face à Redis) et le vectoriel (MongoDB qui internalise toute la chaîne RAG).
+
+---
+
+*Rapport rédigé le 2026-08-03 — Sources : blog PostHog et DuckDB ; avis de sécurité Oracle et bases CVE (SentinelOne, SOCRadar, GitHub Advisory Database) ; blog Valkey et Percona ; MongoDB Product Updates et presse spécialisée (TechTarget, PRNewswire).*
+
+---
+
 # Actualité technique des bases de données — 2026-07-27
 
 ---
