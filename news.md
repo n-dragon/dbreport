@@ -1,3 +1,84 @@
+# Actualité technique des bases de données — 2026-08-10
+
+---
+
+## 1. PostgreSQL 19 Beta 2 : property graphs SQL/PGQ, REPACK natif et pg_plan_advice avant la GA de l'automne
+
+La **Beta 2 de PostgreSQL 19** est sortie le 16 juillet, confirmant le périmètre fonctionnel dévoilé en Beta 1 (4 juin) en vue d'une disponibilité générale attendue en septembre-octobre 2026.
+
+- **SQL/PGQ** (property graph queries, norme SQL:2023) fait son entrée native : les graphes peuvent désormais être interrogés directement en SQL sans extension tierce type Apache AGE.
+- **`REPACK`** remplace l'usage détourné de `VACUUM FULL`/`pg_repack` pour reconstruire une table en ligne, avec verrouillage minimal.
+- **`pg_plan_advice`** donne à l'optimiseur un mécanisme contrôlé et réversible pour accepter des indications de plan lorsqu'il se trompe de cardinalité — une alternative structurée aux hints historiquement absents de Postgres.
+- Autovacuum devient **parallèle**, les performances d'insertion sous contrainte de clé étrangère doublent, et la réplication logique en ligne ne nécessite plus de redémarrage.
+- Changement de défauts notable : le **JIT est désormais désactivé par défaut**, et `default_toast_compression` passe à **lz4**.
+
+**Impact :** au-delà des gains de perf, `pg_plan_advice` et `REPACK` s'attaquent directement à deux irritants opérationnels chroniques (mauvais plans, maintenance de table bloquante) sans recourir à des extensions externes.
+
+Sources : [PostgreSQL 19 Beta 2 Released!](https://www.postgresql.org/about/news/postgresql-19-beta-2-released-3350/), [PostgreSQL 19 features I'm excited about (Bytebase)](https://www.bytebase.com/blog/postgres-19-features-im-excited-about/), [What's New in Postgres 19: Beta Release Deep Dive (Snowflake)](https://www.snowflake.com/en/blog/engineering/postgresql-19-features-beta/)
+
+---
+
+## 2. Sécurité : zero-day SQL injection CVSS 10.0 dans Metabase exploité pour piller les identifiants des bases connectées
+
+Une faille **non authentifiée, CVSS 10.0**, dans l'endpoint public `POST /api/session/reset_password` de Metabase a été exploitée dans la nature dès le 3 août contre des instances Metabase Cloud et self-hosted, avant publication d'un correctif.
+
+- L'injection SQL permet d'obtenir un accès **administrateur complet** sans authentification, puis d'exfiltrer les **identifiants stockés des bases de données connectées** (Postgres, MySQL, Snowflake, etc.) via l'outil BI.
+- Versions affectées : à partir de la 1.58 ; correctifs minimaux à appliquer : **0.58.24, 0.59.21, 0.60.17, 0.61.11, 0.62.9, 0.63.5**.
+- Signature d'attaque identifiable dans les logs : requête `POST /api/session/reset_password` retournant un code 400, suivie d'un `GET /api/user/current` retournant 200.
+- Framework et Tally comptent parmi les victimes confirmées ayant publié une divulgation.
+
+**Impact :** rappel que la surface d'attaque d'une base de données ne se limite pas au SGBD lui-même — un outil BI compromis devient un point d'exfiltration direct des identifiants vers toutes les bases connectées. Un audit des rotations d'identifiants est recommandé pour toute instance Metabase self-hosted non patchée avant début août.
+
+Sources : [Metabase Zero-Day Exploited in Wild Allows Admin Access Without Authentication (The Hacker News)](https://thehackernews.com/2026/08/metabase-zero-day-exploited-in-wild.html), [Metabase SQLi zero-day exploited in customer data-theft attacks (BleepingComputer)](https://www.bleepingcomputer.com/news/security/framework-tally-disclose-metabase-data-theft-attacks/), [Metabase Zero-Day Exploited in the Wild (Security Affairs)](https://securityaffairs.com/196874/hacking/metabase-zero-day-exploited-in-the-wild-exposing-admin-access-and-sensitive-data.html)
+
+---
+
+## 3. Cache / clé-valeur : Valkey franchit les 100 millions de pulls Docker et devient le défaut de facto des distributions Linux
+
+Le fork **Valkey** (Linux Foundation) consolide son statut de choix par défaut post-licence Redis :
+
+- Plus de **100 millions de pulls Docker** (×17 sur un an) au bout de deux ans d'existence du projet.
+- **Fedora 42, Ubuntu 26.04 LTS, Debian 13 (backports) et Arch Linux** basculent désormais Valkey comme paquet de cache par défaut plutôt que Redis.
+- Sur AWS, Valkey reste le moteur par défaut d'**ElastiCache et MemoryDB**, avec des benchmarks communautaires indiquant environ **8 % d'opérations/seconde en plus**, **22 % de réduction de la latence P99** et **20 % de mémoire en moins** face à Redis OSS, pour un coût horaire ElastiCache inférieur d'environ 20 %.
+
+**Impact :** la bascule des distributions Linux majeures est un signal fort — Valkey n'est plus seulement l'option « cloud managé », il devient l'option par défaut au niveau OS, accélérant la migration silencieuse des déploiements auto-hébergés.
+
+Sources : [Two Years of Valkey (RedMonk)](https://redmonk.com/sogrady/2026/04/06/valkey-at-two/), [Valkey vs Redis: What the Fork Means (TechPlained)](https://www.techplained.com/valkey-vs-redis), [Is Valkey Ready to Replace Redis in 2026? (DevOps Daily)](https://devops-daily.com/posts/is-valkey-ready-to-replace-redis-2026)
+
+---
+
+## 4. OLAP / vectoriel : DuckDB détaille sa feuille de route « serveur » pendant que le marché des bases vectorielles se consolide
+
+À l'occasion de **DuckCon #7**, les créateurs de DuckDB ont précisé la feuille de route de la version **2.0** (attendue à l'automne 2026), confirmant l'ambition affichée de faire de DuckDB un véritable serveur analytique multi-utilisateurs et non plus seulement un moteur embarqué.
+
+- Le protocole **Quack** passe de bêta à production, avec une extension communautaire `quack-oauth` apportant OAuth 2.1/OIDC (JWKS, introspection RFC7662, flux Google/GitHub).
+- E/S **asynchrones** (accélération DuckLake et S3), **triggers** pour l'automatisation, requêtes conscientes du partitionnement pour la scalabilité — le paquet déjà annoncé en mai se confirme sans régression de scope.
+
+En parallèle, le marché des bases vectorielles entre dans une phase de consolidation : après avoir exploré une vente amiable face à la concurrence des extensions vectorielles natives (pgvector, MongoDB Atlas Vector Search, Oracle 23ai), **Pinecone** reste scruté par des acquéreurs potentiels (Oracle, IBM, MongoDB, Snowflake) tandis que des analystes Forrester anticipent **2 à 3 acquisitions majeures** du secteur d'ici fin 2026 — le CEO d'Elastic ayant publiquement qualifié la base vectorielle standalone de « feature, jamais un business ».
+
+**Impact :** deux mouvements convergents — les moteurs analytiques embarqués (DuckDB) montent en gamme vers le serveur multi-utilisateur pendant que les bases vectorielles pure-play perdent du terrain face à l'intégration native dans les SGBD généralistes.
+
+Sources : [DuckDB 2.0 Is Coming: What DuckCon #7 Revealed (byteiota)](https://byteiota.com/duckdb-2-0-roadmap-duckcon-7/), [Vector database vendor Pinecone eyes future under new CEO (TechTarget)](https://www.techtarget.com/searchdatamanagement/news/366631366/Vector-database-vendor-Pinecone-eyes-future-under-new-CEO), [On-device vector databases in 2026 (ObjectBox)](https://objectbox.io/262454-2/)
+
+---
+
+## Synthèse (delta depuis le 3 août)
+
+| Axe | Signal fort |
+|---|---|
+| Open source relationnel | PostgreSQL 19 Beta 2 : SQL/PGQ, REPACK natif, pg_plan_advice, JIT off par défaut — GA visée septembre/octobre |
+| Sécurité | Zero-day SQLi CVSS 10.0 dans Metabase exploité en prod dès le 3 août, vol d'identifiants des bases connectées |
+| Cache / clé-valeur | Valkey dépasse 100M de pulls Docker et devient le défaut de Fedora, Ubuntu, Debian et Arch |
+| OLAP / vectoriel | DuckDB 2.0 (Quack en production, E/S async, triggers) confirmé pour l'automne ; consolidation du marché vectoriel autour de Pinecone |
+
+> La semaine illustre la maturation continue de l'open source côté moteur (Postgres 19, DuckDB serveur) pendant que la sécurité rappelle que le maillon faible n'est plus toujours le SGBD lui-même mais l'outillage BI connecté aux bases de production. Sur le plan économique, le fork Valkey achève sa bascule en défaut système tandis que le marché des bases vectorielles pure-play amorce sa consolidation face aux extensions natives.
+
+---
+
+*Rapport rédigé le 2026-08-10 — Sources : release notes officielles PostgreSQL et DuckDB/DuckCon ; The Hacker News, BleepingComputer, Security Affairs (vulnérabilité Metabase) ; RedMonk, TechPlained, DevOps Daily (Valkey) ; TechTarget, ObjectBox (marché des bases vectorielles).*
+
+---
+
 # Actualité technique des bases de données — 2026-08-03
 
 ---
