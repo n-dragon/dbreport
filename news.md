@@ -1,3 +1,80 @@
+# Actualité technique des bases de données — 2026-08-17
+
+---
+
+## 1. PostgreSQL 19 Beta 3 sortie le 13 août : 28 correctifs de sécurité et confirmation du calendrier GA de l'automne
+
+La **Beta 3 de PostgreSQL 19** est parue le 13 août, en même temps que les mises à jour mineures des versions supportées corrigeant **28 vulnérabilités de sécurité** remontées ces derniers mois. Le périmètre fonctionnel dévoilé en Beta 1/2 est confirmé sans nouvelle régression de scope, en vue d'une disponibilité générale toujours attendue en **septembre-octobre 2026**.
+
+- La réplication logique **réplique désormais les valeurs de séquences** et peut être activée sans redémarrage du serveur lorsque `wal_level = replica`.
+- **Autovacuum parallèle** : un nouveau système de score priorise les tables qui ont le plus besoin d'être vacuumées, en plus de la parallélisation des workers sur les index d'une même table.
+- SQL/PGQ (property graph queries) et la commande **`REPACK` (avec option `CONCURRENTLY`)** restent les têtes d'affiche, confirmées depuis la Beta 2.
+- Le projet ne prévoit d'autres bêtas « que si nécessaire » avant de passer aux release candidates.
+
+**Impact :** l'arrivée de correctifs de sécurité en pleine phase bêta rappelle que les versions de développement de Postgres ne sont pas exemptées du cycle de sécurité trimestriel — les environnements de test sur la 19 doivent être patchés au même rythme que la production.
+
+Sources : [PostgreSQL 19 Beta 3 Released!](https://www.postgresql.org/about/news/postgresql-19-beta-3-released-3373/), [PostgreSQL: Roadmap](https://www.postgresql.org/developer/roadmap/), [Postgresql Release Notes — August 2026 (Releasebot)](https://releasebot.io/updates/postgresql)
+
+---
+
+## 2. Sécurité : CVE-2026-56162, faille CVSS 10.0 dans Azure SQL Database, exploitable sans authentification
+
+Microsoft a publié le **6 août** un correctif pour **CVE-2026-56162**, une vulnérabilité d'authentification incorrecte dans Azure SQL Database permettant à un attaquant non authentifié d'élever ses privilèges à distance, sans interaction utilisateur.
+
+- **CVSS 10.0** : vecteur d'attaque réseau, aucune authentification requise, impact total sur confidentialité, intégrité et disponibilité.
+- Elle s'ajoute à **CVE-2026-63522** (élévation de privilèges par mauvaise assignation de permissions, CVSS 7.8) et à **CVE-2026-62836** sur Azure SQL Managed Instance (CVSS 8.7, restriction de canal de communication insuffisante), publiées le même mois.
+- Sur le SQL Server on-premise, **CVE-2026-21262** (élévation de privilèges) permet également de transformer un accès limité en contrôle complet de l'instance.
+
+**Impact :** un mois particulièrement chargé pour l'écosystème SQL Server/Azure SQL — les équipes doivent traiter en priorité les instances Azure SQL Database exposées publiquement et vérifier l'application automatique du correctif managé, Microsoft patchant généralement ces CVE côté plateforme sans action client requise, sauf pour les instances on-prem (CVE-2026-21262).
+
+Sources : [CVE-2026-63522 Azure SQL Database Elevation of Privilege Vulnerability](https://thewindowsupdate.com/2026/08/06/cve-2026-63522-azure-sql-database-elevation-of-privilege-vulnerability/), [CVE-2026-56162 (THREATINT)](https://cve.threatint.com/CVE/CVE-2026-56162), [CVE-2026-21262: The SQL Server Privilege Escalation Flaw](https://www.penligent.ai/hackinglabs/cve-2026-21262-the-sql-server-privilege-escalation-flaw-that-turns-small-access-into-full-database-control/)
+
+---
+
+## 3. Cache / clé-valeur : Valkey chiffre ses gains — Snap économise 1,26 M$/an en migrant depuis Redis
+
+L'adoption de **Valkey** continue de s'accompagner de cas concrets d'économies chiffrées : Snap a publié avoir réduit sa facture de cache de **1,26 million de dollars par an** en migrant vers Valkey, s'ajoutant à la liste croissante d'entreprises documentant des gains similaires depuis la bascule d'AWS ElastiCache et Google Memorystore vers Valkey par défaut.
+
+- Valkey 9 dépasse toujours le milliard de requêtes/seconde en throughput single-cluster depuis octobre 2025, et **Valkey 9.1** (mai 2026) a encore amélioré l'efficacité mémoire.
+- La compatibilité fil-à-fil (wire-compatible) avec Redis continue de faciliter les migrations à coût de réécriture quasi nul pour les applications existantes.
+
+**Impact :** au-delà des benchmarks techniques déjà connus, la publication de chiffres d'économies réels par des entreprises comme Snap renforce l'argumentaire business pour les migrations Redis → Valkey encore en attente côté DSI, souvent freinées par l'inertie plus que par un manque de maturité technique du fork.
+
+Sources : [Valkey 9 After 18 Months: How the Redis Fork Is Reshaping the Cloud Cache Landscape](https://www.cloudmagazin.com/en/2026/04/10/valkey-9-redis-fork-cloud-cache-landscape/), [Choosing the Right Key-Value Store: Redis vs Valkey (Percona)](https://www.percona.com/blog/choosing-the-right-key-value-store-redis-vs-valkey/), [Valkey vs Redis 2026 (Tech Insider)](https://tech-insider.org/valkey-vs-redis-2026/)
+
+---
+
+## 4. Gouvernance IA et données : entrée en application pleine de l'EU AI Act (2 août) et levée de 5 Md$ pour Databricks à 190 Md$ de valorisation
+
+Deux signaux forts sur le volet économique et réglementaire de la donnée cette semaine :
+
+- Les interdictions et obligations de gouvernance des données de l'**article 5 de l'EU AI Act** sont pleinement applicables depuis le **2 août 2026**, avec des amendes pouvant atteindre **35 M€ ou 7 % du chiffre d'affaires mondial annuel** pour les systèmes IA à haut risque — impact direct sur les architectures de bases de données stockant des données d'entraînement ou d'inférence en Europe.
+- **Databricks** a bouclé le 13 août un tour de financement de **5 milliards de dollars** à une valorisation de **190 milliards de dollars**, le CEO Ali Ghodsi justifiant le report d'une IPO par la volonté de continuer à investir dans les produits IA sans la distraction des marchés publics en période de volatilité.
+- Databricks a par ailleurs rendu généralement disponible le **partage de tables Delta avec deletion vectors ou column mapping**, et prolongé l'accès gratuit à Genie One/Genie Agents jusqu'au 31 janvier 2027.
+
+**Impact :** la pression réglementaire européenne et l'afflux de capital chez les plateformes data/IA avancent en parallèle — les équipes data doivent désormais documenter la gouvernance de leurs pipelines pour l'EU AI Act, pendant que les grands entrepôts consolident leur position financière pour accélérer l'intégration native de l'IA.
+
+Sources : [Are Vector Databases Still Relevant in 2026 (Actian)](https://www.actian.com/blog/developer/state-of-vector-databases-q2-2026/), [Databricks wraps $5 billion funding round at $190 billion valuation (CNBC)](https://www.cnbc.com/2026/08/13/databricks-funding-round-190-billion-valuation.html), [Databricks Release Notes — August 2026 (Releasebot)](https://releasebot.io/updates/databricks)
+
+---
+
+## Synthèse (delta depuis le 10 août)
+
+| Axe | Signal fort |
+|---|---|
+| Open source relationnel | PostgreSQL 19 Beta 3 (13 août) : 28 correctifs de sécurité, réplication logique des séquences, autovacuum à scoring — GA toujours visée septembre/octobre |
+| Sécurité | CVE-2026-56162 (CVSS 10.0) sur Azure SQL Database, non authentifiée ; CVE-2026-63522, CVE-2026-62836 et CVE-2026-21262 publiées le même mois sur l'écosystème SQL Server/Azure SQL |
+| Cache / clé-valeur | Valkey documente des économies concrètes (Snap : 1,26 M$/an) en plus de ses gains de performance déjà établis |
+| Gouvernance / capital | Application pleine de l'EU AI Act (2 août, amendes jusqu'à 35 M€/7 % CA) ; Databricks lève 5 Md$ à 190 Md$ de valorisation (13 août) |
+
+> La semaine confirme deux dynamiques déjà à l'œuvre mi-2026 : côté technique, PostgreSQL et l'écosystème SQL Server concentrent l'essentiel de l'actualité sécurité, avec un rythme de correctifs soutenu même en phase bêta ; côté business, la donnée continue d'attirer des capitaux massifs (Databricks) tout en étant de plus en plus encadrée réglementairement (EU AI Act), deux forces qui vont continuer à façonner les priorités des équipes data d'ici la fin de l'année.
+
+---
+
+*Rapport rédigé le 2026-08-17 — Sources : release notes officielles PostgreSQL ; Microsoft Security Response Center, TheWindowsUpdate.com, THREATINT, Penligent (CVE Azure SQL/SQL Server) ; CloudMagazin, Percona, Tech Insider (Valkey) ; Actian, CNBC, Releasebot (gouvernance IA et capital data).*
+
+---
+
 # Actualité technique des bases de données — 2026-08-10
 
 ---
