@@ -1,3 +1,72 @@
+# Actualité technique des bases de données — 2026-08-24
+
+---
+
+## 1. Databricks rachète Electric : Postgres embarqué (PGlite) pour donner à chaque agent IA sa propre base de données locale
+
+Databricks a annoncé le rachat d'**Electric**, l'éditeur de **PGlite**, une distribution de PostgreSQL compilée en **WebAssembly** assez légère pour tourner directement dans une application, un onglet de navigateur ou un sandbox d'agent IA plutôt que sur un serveur dédié.
+
+- Le modèle visé : chaque agent IA exécute une **instance Postgres locale via PGlite**, tandis que le moteur de synchronisation temps réel d'Electric la maintient alignée avec une base Postgres centrale (**Lakebase**, la couche transactionnelle de Databricks), évitant les allers-retours réseau coûteux à chaque décision de l'agent.
+- L'argument produit : les applications agentiques décident à l'exécution des données dont elles ont besoin et mettent à jour leur contexte en continu ; interroger un cloud central à chaque étape devient un goulot d'étranglement pour la latence.
+- Traction avant rachat : les téléchargements hebdomadaires de PGlite sont passés d'**1 million à 13 millions** entre août 2025 et août 2026.
+
+**Impact :** ce rachat illustre une tendance de fond — la base de données comme composant embarqué de l'agent plutôt que service distant — et pousse Postgres (déjà standard de facto côté serveur) vers les environnements edge/sandbox. Les équipes qui construisent des architectures multi-agents devraient surveiller l'intégration PGlite/Lakebase comme future alternative aux stores en mémoire ad hoc utilisés aujourd'hui pour le contexte d'agent.
+
+Sources : [Databricks acquires Electric to give every AI agent its own Postgres database (The New Stack)](https://thenewstack.io/databricks-electric-wasm-agentic-postgres/), [Databricks acquires Electric to bring embeddable Postgres to AI agents (Digitalisation World)](https://digitalisationworld.com/news/23306-databricks-acquires-electric-to-bring-embeddable-postgres-to-ai-agents), [Databricks' Electric acquisition adds embeddable PostgreSQL (TechTarget)](https://www.techtarget.com/data-technologies/news/366649200/Databricks-Electric-acquisition-adds-embeddable-PostgreSQL)
+
+---
+
+## 2. ClickHouse 26.7 : jointures jusqu'à 21 % plus rapides, comparaisons d'entiers larges accélérées ×7
+
+La release **26.7** de ClickHouse, sortie début août, met l'accent sur l'optimisation des jointures et des opérations analytiques les plus courantes plutôt que sur de nouvelles fonctionnalités visibles.
+
+- **Hash join compacté** : les références de table de hachage sont désormais stockées sous forme d'index compacts de 8 octets pour tous les types de clés — sur des jointures de 100 à 300 millions de lignes, gain médian de **12 % de vitesse et -15 % de mémoire pic** ; pour les `INNER JOIN` sur clés `UInt64`, jusqu'à **21 % plus rapide et -38 % de mémoire**.
+- Nouvel algorithme de **join pruning** et de réordonnancement automatique des jointures dans les requêtes multi-tables.
+- Contributions communautaires notables : comparaisons d'entiers larges (wide integers) accélérées jusqu'à **×7**, décompression Delta jusqu'à **×5**, agrégats statistiques et bitwise jusqu'à **×4**.
+
+**Impact :** ces gains ciblent directement les charges analytiques à grande échelle (jointures multi-tables sur de gros volumes) sans changement de schéma ni de requête côté utilisateur — une mise à jour vers 26.7 peut donc apporter un gain de performance « gratuit » aux pipelines ClickHouse existants qui font des jointures lourdes.
+
+Sources : [ClickHouse Release 26.7](https://clickhouse.com/blog/clickhouse-release-26-07), [August 2026 newsletter (ClickHouse)](https://clickhouse.com/blog/202608-newsletter), [ClickHouse 26.7 Release Emphasizes Performance and AI-Oriented Analytics (TipRanks)](https://www.tipranks.com/news/private-companies/clickhouse-26-7-release-emphasizes-performance-and-ai-oriented-analytics)
+
+---
+
+## 3. MongoDB Atlas : Managed MCP Server et API d'embeddings/reranking passent en disponibilité générale
+
+Lors de MongoDB.local Build Fest (13 août), MongoDB a fait passer en **disponibilité générale** deux briques centrées sur l'IA agentique dans Atlas.
+
+- **Managed MCP Server** : connecte directement des agents de code (Claude Code, Codex, Grok Build, Devin) aux données opérationnelles live d'un cluster Atlas, sans étape d'export ni de synchronisation manuelle.
+- **Embedding and Reranking API** : nouveau service serverless GA, complété par les **Automated Voyage AI Embeddings** dans Atlas Vector Search — les embeddings sont désormais générés automatiquement à l'écriture ou à la mise à jour des documents, pour donner aux agents un contexte vectoriel toujours à jour sans pipeline d'ingestion séparé.
+
+**Impact :** MongoDB consolide sa position de base multi-modèle « prête pour l'agent » en supprimant deux frictions classiques des architectures RAG — la resynchronisation manuelle des embeddings et l'accès sécurisé aux données live depuis un agent de code — ce qui réduit d'autant le code d'orchestration à maintenir côté application.
+
+Sources : [MongoDB adds new vector, performance capabilities to aid AI (TechTarget)](https://www.techtarget.com/searchdatamanagement/news/366642768/MongoDB-adds-new-vector-performance-capabilities-to-aid-AI), [MongoDB intros latest features to fuel AI development (TechTarget)](https://www.techtarget.com/data-technologies/news/366649199/MongoDB-intros-latest-features-to-fuel-AI-development), [New in MongoDB](https://www.mongodb.com/products/updates/)
+
+---
+
+## 4. Cache clé-valeur : un benchmark indépendant confirme l'avance de Valkey sur Redis (+37 % de débit)
+
+Un comparatif indépendant publié en août par DragonflyDB mesure **999 800 SET/s pour Valkey 8.1** contre **729 400 SET/s pour Redis 8.0**, avec une latence P99 en écriture de **0,80 ms contre 0,99 ms**.
+
+- Valkey reste le cache par défaut sur Fedora, Ubuntu, Debian et Arch ; les grandes distributions Linux ont cessé de packager Redis.
+- AWS a migré la majorité de ses nœuds ElastiCache vers Valkey et le facture environ **20 % moins cher que Redis OSS sur ElastiCache** et **30 % moins cher sur MemoryDB**.
+- Valkey 9.1 (mai 2026) reste la version de référence, avec des gains annoncés de +8 % d'opérations/seconde, -22 % de latence P99 et -20 % de mémoire par rapport à Redis.
+
+**Impact :** au-delà des chiffres déjà connus depuis le fork, la confirmation par un acteur tiers (DragonflyDB, lui-même concurrent) que l'écart de performance est réel et mesurable retire un argument de poids aux équipes qui retardaient encore leur migration Redis → Valkey pour des raisons de prudence technique plutôt que de compatibilité applicative.
+
+Sources : [Valkey 9 After 18 Months: How the Redis Fork Is Reshaping the Cloud Cache Landscape](https://www.cloudmagazin.com/en/2026/04/10/valkey-9-redis-fork-cloud-cache-landscape/), [Valkey vs Redis 2026: 8% Faster, 20% Cheaper (Tech Insider)](https://tech-insider.org/valkey-vs-redis-2026/), [Is Valkey Ready to Replace Redis in 2026? (DevOps Daily)](https://devops-daily.com/posts/is-valkey-ready-to-replace-redis-2026)
+
+---
+
+## 5. PostgreSQL : correctif sur l'invalidation des plans mis en cache après changement de rôle, mise à jour tzdata 2026c
+
+Dans la continuité des correctifs mineurs d'août, PostgreSQL a affiné un point précis de gestion du cache de plans d'exécution : **l'invalidation des plans mis en cache basés sur les rôles** est désormais correctement déclenchée après un changement de rôle (`ALTER ROLE`, changement de droits), évitant qu'une session réutilise un plan calculé sous d'anciens privilèges. Les données de fuseaux horaires ont également été mises à jour vers **tzdata 2026c**.
+
+**Impact :** un bug d'invalidation de plan de ce type est difficile à détecter en production (le comportement erroné dépend de l'ordre des changements de droits et du cache de session) — les environnements multi-tenants avec `ROW LEVEL SECURITY` ou permissions dynamiques par rôle sont les plus exposés et devraient prioriser l'application de ce correctif mineur.
+
+Sources : [Postgresql Release Notes — August 2026 (Releasebot)](https://releasebot.io/updates/postgresql), [PostgreSQL: Release Notes](https://www.postgresql.org/docs/release/), [PostgreSQL: Security Information](https://www.postgresql.org/support/security/)
+
+---
+
 # Actualité technique des bases de données — 2026-08-17
 
 ---
