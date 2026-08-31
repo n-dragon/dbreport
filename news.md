@@ -1,3 +1,60 @@
+# Actualité technique des bases de données — 2026-08-31
+
+---
+
+## 1. ClickHouse 26.8 LTS : 416 optimisations de performance activées par défaut, cinq versions de rattrapage depuis la 26.3
+
+La branche de la version **26.8 LTS** de ClickHouse a été coupée le **27 août** (images Docker pas encore publiées à cette date), en passe de succéder à la 26.3 comme prochaine version à support long terme.
+
+- **416 améliorations de performance**, pour la plupart activées par défaut sans configuration supplémentaire — dans la continuité des gains ciblés (jointures, comparaisons d'entiers larges, décompression Delta) déjà documentés sur les versions intermédiaires 26.4 à 26.7.
+- Passer directement de la 26.3 LTS à la 26.8 LTS cumule **57 changements de compatibilité ascendante** apparus sur les releases intermédiaires (passage à AVX2 obligatoire, refonte des identifiants S3, nouveau format de sortie `EXPLAIN`) : les équipes qui sautent plusieurs versions LTS doivent auditer leurs tableaux de bord et scripts qui parsent les tables système ou la sortie d'`EXPLAIN`.
+
+**Impact :** un rythme de version LTS qui continue de livrer de la performance « gratuite » par défaut, mais un saut de version de plus en plus coûteux à valider pour les gros déploiements — l'écart de cinq releases entre deux LTS successives concentre davantage de risque de compatibilité qu'auparavant.
+
+Sources : [ClickHouse 26.8 LTS: 57 Breaking Changes Since 26.3 (DEV Community)](https://dev.to/mohhddhassan/clickhouse-268-lts-57-breaking-changes-since-263-3ba9), [August 2026 newsletter (ClickHouse)](https://clickhouse.com/blog/202608-newsletter), [Changelog 2026 (ClickHouse Documentation)](https://clickhouse.com/docs/whats-new/changelog)
+
+---
+
+## 2. DBOS : Go 1.0 et un ordre de grandeur de débit en plus sur les files d'attente partitionnées (Postgres)
+
+DBOS, le framework d'exécution durable adossé à PostgreSQL, a publié sa mise à jour de rentrée avec la sortie de **DBOS Go 1.0** et une nouvelle CLI pour **DBOS Conductor**.
+
+- Le point marquant reste l'optimisation des **files d'attente partitionnées** : un gain de débit d'un **ordre de grandeur** à latence égale, y compris avec un grand nombre de tâches en attente.
+- Trois leviers techniques identifiés : des **index plus efficaces** réduisant les ressources base de données consommées à chaque poll de file, un **dequeue par lot** permettant à un worker de dépiler des tâches de plusieurs partitions en une seule transaction, et le remplacement d'un `SELECT DISTINCT` — identifié comme goulot d'étranglement majeur à l'échelle — par une alternative plus rapide.
+
+**Impact :** un cas concret où le gain de performance vient d'une optimisation du SQL généré par la couche applicative plutôt que du moteur lui-même — une piste utile pour tout DBA qui audite des requêtes `DISTINCT` ou des schémas de polling sur des tables Postgres à fort volume d'écriture.
+
+Sources : [DBOS Product Update August 2026](https://www.dbos.dev/blog/new-in-dbos-august-2026), [Queues & Concurrency (DBOS Docs)](https://docs.dbos.dev/golang/tutorials/queue-tutorial)
+
+---
+
+## 3. MySQL 9.7.0 : jusqu'à 14,3 % de gain grâce à la compilation guidée par profil (PGO)
+
+Percona a publié une analyse de benchmark détaillée de **MySQL 9.7.0**, version LTS de référence de la ligne 9.x, compilée avec **Profile-Guided Optimization (PGO)**.
+
+- Gain de performance mesuré : **+14,3 % à un seul thread**, décroissant progressivement jusqu'à **+10,3 % à 512 threads** — un profil de gain inhabituel où l'optimisation reste significative même en forte concurrence, plutôt que de s'effacer avec le nombre de threads comme c'est souvent le cas.
+- Ce résultat s'inscrit dans la continuité des benchmarks Percona plus tôt dans l'année, qui montraient déjà MySQL 9.1.0 seulement **0,68 % plus lent** que 8.4.3 en lecture/écriture : l'écart de performance historique entre branches majeures continue de se resserrer.
+
+**Impact :** une optimisation « gratuite » côté binaire — aucun changement de requête ni de schéma requis — qui profite en particulier aux instances mono-thread ou faiblement parallélisées, souvent les moins bien loties par les optimisations précédentes centrées sur la scalabilité multi-thread.
+
+Sources : [MySQL 9.7.0 PGO Benchmark Analysis (Percona)](https://www.percona.com/blog/mysql-9-7-0-pgo-benchmark-analysis/), [Inside MySQL 9.7 LTS Features (Percona)](https://www.percona.com/blog/inside-mysql-9-7-lts-features/)
+
+---
+
+## 4. Bases vectorielles : la recherche hybride s'impose comme standard d'entreprise, pgvector reste le choix par défaut sur Postgres
+
+Les guides comparatifs d'août 2026 sur les bases vectorielles convergent vers un même constat : la **recherche hybride** (dense + BM25 + reranking), plutôt qu'une base vectorielle pure-play isolée, est devenue le standard de fait des architectures RAG en entreprise.
+
+- Pour les équipes déjà sur PostgreSQL, **pgvector** reste recommandé comme option par défaut : documents et embeddings dans la même table, même transaction, filtrage SQL natif, sans pipeline de synchronisation ni service supplémentaire à surveiller.
+- Selon le cas d'usage, les guides orientent plutôt vers **Weaviate** (recherche hybride configurable), **Turbopuffer** (architecture object-storage native pour le multi-tenant à grande échelle) ou **LanceDB** (données multimodales colocalisées avec les embeddings).
+- Tendance de fond à surveiller : les **bases vectorielles embarquées (« on-device »)** progressent, portées par la généralisation des NPU côté mobile, la réduction de taille des modèles d'embedding et l'amélioration de la quantification binaire — au point de devenir un besoin réel plutôt qu'une simple curiosité technique.
+
+**Impact :** pour une équipe qui démarre un projet RAG aujourd'hui, le choix par défaut n'est plus « quelle base vectorielle dédiée choisir » mais « pgvector suffit-il, ou le volume/la latence justifient-ils une base spécialisée » — un renversement de la logique qui prévalait lors du pic d'adoption des bases vectorielles pure-play en 2023-2024.
+
+Sources : [The 11 Best Vector Database Providers (August 2026) (Mastra)](https://mastra.ai/articles/best-vector-database-providers), [Top 9 Vector Databases as of August 2026 (Shakudo)](https://www.shakudo.io/blog/top-9-vector-databases), [On-device vector databases in 2026 (ObjectBox)](https://objectbox.io/262454-2/)
+
+---
+
 # Actualité technique des bases de données — 2026-08-24
 
 ---
