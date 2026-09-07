@@ -1,3 +1,80 @@
+# Actualité technique des bases de données — 2026-09-07
+
+---
+
+## 1. Sécurité PostgreSQL : CVE-2026-6471 (« PostGREShell »), une faille de 12 ans dans le logical decoding permet la prise de contrôle du serveur
+
+The Hacker News et SecurityWeek ont détaillé début septembre **CVE-2026-6471**, surnommée « PostGREShell » : une autorisation manquante dans le sous-système de **logical decoding** de PostgreSQL, présente depuis son introduction en version 9.4 (2014) et confirmée jusqu'à la 18.
+
+- N'importe quel rôle disposant simplement du privilège **REPLICATION** — sans être superuser — peut choisir un plugin de sortie (« output plugin ») arbitraire pour le logical decoding, ce qui déclenche un `dlopen()` de n'importe quel fichier visible par le compte OS exécutant le serveur, et donc une **exécution de code arbitraire** sous cette identité, avec possibilité de se créer une porte dérobée superuser persistante.
+- Exploitation limitée aux serveurs configurés avec `wal_level = logical` — mais c'est aujourd'hui la configuration standard partout où la réplication logique, les pipelines de **Change Data Capture** (Debezium et équivalents), les sauvegardes ou la supervision sont en place, autant d'outils qui détiennent couramment le privilège REPLICATION.
+- **CVSS 7.2**. Correctif publié le 13 août dans les versions **18.6, 17.11, 16.15, 15.19 et 14.24**, via un nouveau paramètre serveur `output_plugin_libraries` qui restreint la liste des bibliothèques chargeables comme plugin de sortie (valeur par défaut : `pgoutput, test_decoding`).
+
+**Impact :** contrairement aux failles qui exigent déjà un accès superuser, celle-ci part d'un privilège largement délégué à des comptes de service (CDC, réplicas, sauvegarde, monitoring) — un audit des rôles porteurs de REPLICATION et l'application immédiate du correctif (ou la restriction explicite de `output_plugin_libraries`) doivent être traités en priorité, indépendamment du cycle de patch habituel.
+
+Sources : [PostgreSQL Fixes 12-Year-Old Logical Decoding Flaw Enabling Replication-Role Code Execution (The Hacker News)](https://thehackernews.com/2026/09/postgresql-fixes-12-year-old-logical.html), [12-Year-Old PostgreSQL Vulnerability Enables Database, Server Takeover (SecurityWeek)](https://www.securityweek.com/12-year-old-postgresql-vulnerability-enables-database-server-takeover/), [CVE-2026-6471: PostGREShell PostgreSQL RCE Vulnerability Explained (The CyberSec Guru)](https://thecybersecguru.com/exploits/cve-2026-6471-postgresql-postgreshell-rce/)
+
+---
+
+## 2. PostgreSQL 19 : les requêtes de graphe SQL/PGQ sous les projecteurs à l'approche de la disponibilité générale
+
+The Register a publié le 4 septembre une analyse approfondie de la fonctionnalité phare de **PostgreSQL 19** : le support natif de **SQL/PGQ** (norme SQL:2023 pour les property graphs), issu d'une collaboration entre plusieurs des plus gros contributeurs du projet.
+
+- SQL/PGQ permet de définir un **property graph** comme une vue logique au-dessus de tables relationnelles existantes — sans dupliquer les données ni migrer vers une base de graphe dédiée — puis de l'interroger via une syntaxe de pattern-matching (`GRAPH_TABLE`, `MATCH`).
+- Au 7 septembre, la version reste en phase bêta (**Beta 3** depuis le 13 août, cf. rapport du 17 août) : aucune release candidate n'a encore été publiée. La disponibilité générale reste attendue **plus tard ce mois-ci ou début octobre**, dans la continuité du calendrier habituel du projet.
+- Le reste du périmètre annoncé en bêta (REPACK unifié, autovacuum parallèle, `pg_plan_advice`, réplication logique des séquences) est confirmé sans régression depuis les rapports précédents.
+
+**Impact :** en standardisant les requêtes de graphe directement en SQL sur des tables déjà en place, Postgres continue de grignoter des cas d'usage jusqu'ici réservés à Neo4j ou Amazon Neptune — les équipes qui font cohabiter aujourd'hui un cluster Postgres et une base de graphe légère pour des traversées simples peuvent commencer à évaluer une consolidation dès la sortie de la RC.
+
+Sources : [PostgreSQL 19 connects the dots with standardized graph queries (The Register)](https://www.theregister.com/databases/2026/09/04/postgresql-19-connects-the-dots-with-standardized-graph-queries/5294500), [From Joins to Graph Edges: SQL/PGQ in PostgreSQL 19 (DEV Community)](https://dev.to/franckpachot/from-joins-to-graph-edges-sqlpgq-in-postgresql-19-2doo), [PostgreSQL 19 SQL/PGQ - Graph Queries on Existing Tables (Neon)](https://neon.com/postgresql/postgresql-19/sql-pgq-graph-queries)
+
+---
+
+## 3. DuckDB : AWS rachète DuckLabs en s'engageant sur le MIT open source, pendant que la version 2.0-alpha sort avec des E/S asynchrones
+
+Deux annonces coup sur coup autour de **DuckDB**, le moteur analytique embarqué : le rachat de son éditeur par AWS (effectif au 1er septembre) et la sortie de l'alpha de la prochaine version majeure.
+
+- **AWS a signé l'acquisition de DuckLabs**, la société d'Amsterdam créée par Hannes Mühleisen et Mark Raasveldt, créateurs de DuckDB. AWS précise explicitement ne pas racheter le projet open source lui-même : **DuckDB, DuckLake, Quack et toutes les extensions restent sous licence MIT**, sous la gouvernance de la **DuckDB Foundation**, association à but non lucratif indépendante qui va mettre en place un comité consultatif de parties prenantes (« stakeholder advisory board »).
+- Mühleisen et Raasveldt continuent de diriger l'équipe (désormais chez AWS) et l'orientation technique du projet open source.
+- Le **2 septembre**, la branche `v2.0-cyanoptera` a été coupée (feature freeze) et une **version alpha de DuckDB 2.0** est disponible au test, avec pour tête d'affiche des **E/S asynchrones** dans tout le moteur : la couche d'entrée/sortie peut désormais scaler indépendamment de la couche d'exécution des requêtes, ce qui démultiplie le parallélisme sur les lectures distantes (Parquet/CSV sur S3 notamment). Une **API C revue** accompagne la sortie. Version finale visée pour la **seconde moitié d'octobre**.
+
+**Impact :** l'arrivée du plus gros fournisseur cloud derrière l'équipe fondatrice du moteur OLAP embarqué le plus populaire, au moment même où celui-ci livre son plus gros changement d'architecture depuis sa création (E/S async taillées pour le stockage objet), pourrait accélérer nettement l'ambition « DuckDB comme serveur » déjà évoquée cet été — à surveiller : le rythme d'intégration avec les offres S3 Tables/Iceberg d'AWS.
+
+Sources : [AWS and DuckLabs: Building the future of analytics together (AWS Big Data Blog)](https://aws.amazon.com/blogs/big-data/aws-and-ducklabs-building-the-future-of-analytics-together/), [AWS buys DuckLabs, the people behind the popular in-process OLAP database (The Register)](https://www.theregister.com/databases/2026/08/26/aws-buys-ducklabs-the-people-behind-the-popular-in-process-olap-database/5292590), [Try DuckDB v2.0-alpha (DuckDB)](https://duckdb.org/2026/09/02/try-duckdb-20-alpha), [DuckLabs to Join AWS, Projects to Remain Open Source (DuckDB)](https://duckdb.org/2026/08/26/ducklabs-to-join-aws)
+
+---
+
+## 4. Sécurité cloud data : McKesson confirme une brèche Snowflake/Salesforce revendiquée par ShinyHunters, rançon de 55 M$ exigée
+
+Le géant américain de la distribution pharmaceutique **McKesson** a confirmé le **28 août** une intrusion après que le groupe **ShinyHunters** a revendiqué le vol de **284 millions d'enregistrements patients**.
+
+- Vecteur d'attaque : des attaques de **vishing** (hameçonnage vocal) ont compromis les comptes SSO **Okta** de plusieurs employés, permettant aux attaquants de pivoter vers les environnements cloud **Salesforce** et **Snowflake** de l'entreprise — pas de vulnérabilité applicative exploitée côté plateformes elles-mêmes.
+- Exfiltration revendiquée : environ **1 To de données sur quatre jours** (21-25 août), incluant noms, adresses, dates de naissance, numéros de sécurité sociale, identifiants patients, informations Medicaid, numéros de dossiers médicaux, traitements/allergies et informations médecins. ShinyHunters a exigé une rançon de **55,2 M$** sous 72 h.
+- Précision importante : le chiffre de 284 millions correspond à des **lignes de données brutes**, pas à des patients uniques ; aucune de ces revendications n'est indépendamment vérifiée à ce stade.
+
+**Impact :** un nouvel exemple du schéma désormais récurrent en 2026 — la brèche ne vient pas d'une faille du moteur Snowflake ou Salesforce lui-même, mais de la compromission des identités SSO qui y donnent accès. Cela renforce la priorité donnée au durcissement MFA résistant au vishing, à la rotation et au scoping des identifiants de service connectés aux entrepôts cloud, et à la détection d'exports massifs anormaux depuis ces environnements.
+
+Sources : [McKesson discloses breach after ShinyHunters claims patient data theft (BleepingComputer)](https://www.bleepingcomputer.com/news/security/mckesson-discloses-breach-after-shinyhunters-claims-patient-data-theft/), [ShinyHunters claims it stole 284 million patient records from McKesson (Help Net Security)](https://www.helpnetsecurity.com/2026/08/31/healthcare-company-mckesson-data-breach/), [ShinyHunters Claims Theft of 284M Records from Healthcare Giant McKesson (HIPAA Journal)](https://www.hipaajournal.com/mckesson-data-breach/)
+
+---
+
+## Synthèse (delta depuis le 31 août)
+
+| Axe | Signal fort |
+|---|---|
+| Sécurité PostgreSQL | CVE-2026-6471 « PostGREShell » (CVSS 7.2) : 12 ans d'ancienneté, exploitable via le seul privilège REPLICATION — patché le 13 août (18.6/17.11/16.15/15.19/14.24) |
+| PostgreSQL 19 | SQL/PGQ (graphes de propriétés) mis en avant à l'approche de la GA ; toujours en bêta au 7 septembre, GA visée fin septembre/début octobre |
+| OLAP / écosystème | AWS rachète DuckLabs (effectif 1er septembre) en garantissant le MIT open source de DuckDB ; alpha de DuckDB 2.0 (E/S asynchrones) sortie le 2 septembre |
+| Sécurité cloud data | McKesson confirme une brèche Snowflake/Salesforce via vishing des comptes Okta (ShinyHunters, 284 M d'enregistrements revendiqués, rançon 55,2 M$) |
+
+> La semaine illustre deux tendances de fond de 2026 : côté moteur, la sécurité continue de se déplacer vers les fonctionnalités « périphériques » largement déléguées (logical decoding, privilège REPLICATION) plutôt que vers le cœur SQL, pendant que Postgres poursuit son absorption de cas d'usage historiquement externes (graphes) à l'approche de sa version 19. Côté écosystème, le rachat de DuckLabs par AWS confirme l'intérêt stratégique des hyperscalers pour les moteurs analytiques embarqués « lean », tandis que la brèche McKesson rappelle, une fois de plus, que le maillon faible des plateformes data cloud reste l'identité (SSO) plutôt que le moteur lui-même.
+
+---
+
+*Rapport rédigé le 2026-09-07 — Sources : The Hacker News, SecurityWeek, The CyberSec Guru (CVE-2026-6471 PostgreSQL) ; The Register, DEV Community, Neon (PostgreSQL 19 / SQL-PGQ) ; AWS Big Data Blog, The Register, DuckDB.org (rachat DuckLabs / DuckDB 2.0-alpha) ; BleepingComputer, Help Net Security, HIPAA Journal (brèche McKesson).*
+
+---
+
 # Actualité technique des bases de données — 2026-08-31
 
 ---
