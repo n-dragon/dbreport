@@ -1,3 +1,32 @@
+# 2026-10-05 — Actualité technique des bases de données
+
+## PostgreSQL 19 (GA attendue sept./oct. 2026)
+Beta 1 le 4 juin, Beta 2 le 16 juillet 2026. Points marquants :
+- `REPACK ... CONCURRENTLY` : reconstruction de tables en ligne, sans verrou bloquant.
+- I/O asynchrone : pool de workers auto-dimensionné (`io_min_workers` / `io_max_workers`).
+- Autovacuum parallèle.
+- Extension `pg_plan_advice` : épinglage de plans de requêtes.
+- Requêtes de graphes natives SQL/PGQ (property graphs).
+- Insertions jusqu'à 2x plus rapides avec contraintes de clés étrangères.
+- Changements de défauts : JIT désactivé, compression TOAST en `lz4`.
+
+À tester avant migration : les changements de défauts (JIT, TOAST) peuvent modifier les profils de performance.
+
+## DuckDB / écosystème analytique
+- DuckDB 2.0 annoncée ; DuckLabs rejoint AWS (DuckDB, DuckLake, Quack restent MIT, gérés par la DuckDB Foundation).
+- MotherDuck rachète Tower.dev (agents IA pour l'ingénierie de données).
+- Extension MSSQL : protocole TDS natif, filter pushdown, transactions, bulk load vers SQL Server.
+
+## MySQL / forks
+- AliSQL (Alibaba) intègre DuckDB comme moteur OLAP colonnaire et la recherche vectorielle HNSW (`VECTOR(N)` jusqu'à 16 383 dimensions, `COSINE_DISTANCE`).
+
+## Tendance
+Convergence OLTP/OLAP (DuckDB embarqué dans les moteurs OLTP), vectoriel natif partout, et automatisation de la maintenance (vacuum, repack, plans).
+
+Sources : [PostgreSQL 19 Beta 1](https://www.postgresql.org/about/news/postgresql-19-beta-1-released-3313/), [DEV – PG19 changes](https://dev.to/mr_manushukla/postgresql-19-5-production-changes-to-test-before-the-september-2026-ga-5ged), [MotherDuck – DuckDB newsletter sept. 2026](https://motherduck.com/blog/duckdb-ecosystem-newsletter-september-2026/)
+
+---
+
 # Actualité technique des bases de données — 2026-05-19
 
 ---
