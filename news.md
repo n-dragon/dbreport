@@ -1,3 +1,43 @@
+# 2026-10-12 — Actualité technique des bases de données
+
+
+> Sources secondaires (blogs, agrégateurs) : à recouper avec les release notes officielles avant toute décision. Les points incertains sont signalés.
+
+## PostgreSQL 19 — en fin de bêta
+- Bêta 1 le 4 juin 2026, bêta 3 le 13 août (avec les correctifs de sécurité 18.6 / 17.11 / 16.15 / 15.19 / 14.24, 28 CVE). Une bêta 4 aurait suivi ; release candidate puis GA attendus en octobre.
+- **REPACK** (avec `CONCURRENTLY`) : remplace `VACUUM FULL` / `CLUSTER` sans bloquer lectures/écritures.
+- **Autovacuum parallèle** du nettoyage d'index (`autovacuum_max_parallel_workers`) et priorisation des tables par score.
+- **Réplication logique** : synchronisation des séquences ; activation sans redémarrage avec `wal_level = replica`.
+- **`pg_plan_advice`** : figer des décisions du planificateur (stabilité des plans après upgrade).
+- **`WAIT FOR LSN`** : cohérence « read-your-writes » sur les réplicas.
+- Nouveaux défauts (à vérifier) : JIT désactivé, compression TOAST en lz4.
+- ⚠️ Selon la couverture de la bêta 4, SQL/PGQ, bascule en ligne des checksums et merge/split de partitions auraient été retirés ; les sources divergent.
+- **Échéance** : PostgreSQL 14 en fin de support le **12 novembre 2026**.
+
+## MySQL / Oracle
+- Nouveau versionnement calendaire : **MySQL 26.7.0** (Innovation) en parallèle de la LTS **9.7.x** (9.7.2).
+- **Thread pool** disponible pour la première fois dans Community Server (26.7.0 / 9.7.2).
+- Préversion **MySQL 26.10.0** (MySQL Labs, hors production) : **MySQL REST Service** intégré au serveur, sans MySQL Router.
+- Oracle ajoute des **patchs de sécurité critiques mensuels** en plus du cycle trimestriel (CPU).
+- Recherche vectorielle : plugin MyVector compatible 26.7, et arrivée dans Percona Server for MySQL.
+- Oracle AI World : 25-28 octobre (Las Vegas) ; Oracle Database SE2 annoncée pour octobre.
+
+## Analytique / embarqué
+- **DuckDB 2.0 (alpha)** : lectures Parquet sur S3 2 à 3× plus rapides (pool de téléchargement I/O asynchrone) ; régression connue sur les casts de listes `VARIANT` (plus lents que JSON).
+- **Databricks SQL** : *query tags* (étiquettes clé/valeur pour attribution des coûts) en GA depuis le 30 septembre.
+
+## Marché
+- **Supabase** lève 150 M$ (2 octobre) et rachète **Turso** (réécriture de SQLite en Rust) pour des bases orientées agents IA. Consolidation Postgres + SQLite/edge à suivre.
+
+## À retenir
+1. Planifier la migration hors PostgreSQL 14 avant le 12 novembre.
+2. Tester PG 19 RC (JIT off, TOAST lz4, REPACK) en préproduction.
+3. Surveiller la stabilisation du versionnement MySQL 26.x vs 9.7 LTS.
+
+*Sources : [postgresql.org](https://www.postgresql.org/about/news/postgresql-19-beta-1-released-3313/), [Snowflake – Postgres 19](https://www.snowflake.com/en/blog/engineering/postgresql-19-features-beta/), [Neon – PG 19](https://neon.com/postgresql/postgresql-19-new-features), [Village News MySQL 6 oct. 2026](https://villagesql.com/blog/village-news-mysql-news-events-6-october-2026/), [Oracle DB Monthly News sept. 2026](https://blogs.oracle.com/coretec/oracle-database-monthly-news-september-2026-quick-links), [Azure Databricks sept. 2026](https://learn.microsoft.com/en-us/azure/databricks/release-notes/product/2026/september).*
+
+---
+
 # 2026-10-05 — Actualité technique des bases de données
 
 ## PostgreSQL 19 (Beta 4 le 24 sept., RC début octobre, GA d'ici fin octobre)
@@ -26,6 +66,7 @@ Convergence OLTP/OLAP (DuckDB embarqué dans les moteurs OLTP), vectoriel natif 
 Sources : [PostgreSQL 19 Beta 1](https://www.postgresql.org/about/news/postgresql-19-beta-1-released-3313/), [DEV – PG19 changes](https://dev.to/mr_manushukla/postgresql-19-5-production-changes-to-test-before-the-september-2026-ga-5ged), [MotherDuck – DuckDB newsletter sept. 2026](https://motherduck.com/blog/duckdb-ecosystem-newsletter-september-2026/)
 
 ---
+
 # Actualité technique des bases de données — 2026-09-28
 
 ---
