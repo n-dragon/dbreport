@@ -1,3 +1,32 @@
+# 2026-10-19 — Actualité technique des bases de données
+
+> Sources secondaires (blogs, agrégateurs) : à recouper avec les release notes officielles avant toute décision. Les points incertains sont signalés.
+
+## PostgreSQL 19 — RC1 publiée, GA décalée en novembre
+- **RC1** disponible ; **RC2 prévue le 12 novembre** (avec la release de maintenance des versions supportées) et **GA le 19 novembre 2026** (sauf blocage). Le calendrier a glissé : la bêta 4 (24 sept.) annonçait une GA en octobre.
+- Fonctions phares inchangées : `REPACK … CONCURRENTLY`, autovacuum parallèle sur les index, synchronisation des séquences en réplication logique, `pg_plan_advice`, `WAIT FOR LSN`.
+- ⚠️ Points d'attention à l'upgrade (source secondaire) : **JIT désactivé par défaut**, **suppression du support RADIUS**. Migration via `pg_upgrade` ou dump/restore.
+- **Échéance** : PostgreSQL 14 en fin de support le **12 novembre 2026**.
+
+## Analytique / embarqué
+- **ClickHouse** : 26.9 en stable (patch 26.9.18.11, 13 oct.), patchs simultanés sur les LTS 26.8 et 26.3. Axes de la 26.8 : SQL « pipeliné », nouveaux tokenizers de texte, requêtes en arrière-plan.
+- **DuckDB** : 2.0 toujours à venir (preview août : extension *Quack* pour interroger d'autres bases, I/O asynchrone, positionnement « DuckDB en mode serveur »). **Fins de support** : 1.5 le 1ᵉʳ novembre, 1.4 LTS le 17 novembre (dates issues d'un site tiers, à confirmer).
+
+## Cache / NoSQL
+- **Valkey 9.1** : jusqu'à ~10 % de mémoire en moins, ACL au niveau base, commande `CLUSTERSCAN`.
+
+## MySQL
+- Pas de nouveauté majeure repérée cette semaine ; rappel : Oracle AI World du 25 au 28 octobre (annonces probables). VillageSQL (fork MySQL à extensions, alpha, 35 M$ levés) reste à suivre.
+
+## À retenir
+1. Caler les tests PG 19 sur RC1/RC2 (JIT off, RADIUS, REPACK) ; GA le 19 nov.
+2. Migration hors PG 14 avant le 12 novembre.
+3. Vérifier la version DuckDB utilisée avant les EOL de novembre.
+
+*Sources : [PostgreSQL 19 RC1](https://www.postgresql.org/about/news/postgresql-19-rc-1-released-3409/), [PostgreSQL 19 RC1 – warp2search](https://www.warp2search.net/story/postgresql-19-rc1-released-native-repack-parallel-autovacuum-and-upgrades-to-watch/), [PostgreSQL 19 beta 4](https://www.postgresql.org/about/news/postgresql-19-beta-4-3386/), [ClickHouse versions](https://versionlog.com/clickhouse/), [DuckDB EOL](https://endoflife.ai/article-duckdb-eol), [DuckDB Ecosystem Newsletter juillet 2026](https://motherduck.com/blog/duckdb-ecosystem-newsletter-july-2026/), [VillageSQL – InfoQ](https://www.infoq.com/news/2026/02/villagesql-mysql).*
+
+---
+
 # 2026-10-12 — Actualité technique des bases de données
 
 
