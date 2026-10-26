@@ -1,3 +1,41 @@
+# Actualité technique des bases de données — 2026-10-26
+
+> Sources : recherches web du 2026-10-26 (notes de version PostgreSQL, Percona, Alibaba Cloud, presse spécialisée). Les éléments marqués ⚠️ proviennent de sources secondaires et sont à vérifier dans les notes de version officielles.
+
+## PostgreSQL 19 (Beta 3, mise à jour du 13 août 2026)
+
+- **Insertions** : jusqu'à 2x plus rapides lorsque des contraintes de clé étrangère sont présentes.
+- **Planificateur / exécuteur** : nouvelles optimisations d'anti-join, usage élargi des tris incrémentaux, *eager aggregation*, lectures de stockage plus rapides en parallel seq scan.
+- **I/O asynchrones** : `io_method=worker` ajuste désormais automatiquement le nombre de workers (bornes min/max configurables).
+- **`pg_plan_advice`** : nouvelle extension pour stabiliser et contrôler les décisions du planificateur.
+- **`REPACK`** : nouvelle commande (réorganisation de tables, successeur naturel de `VACUUM FULL`/`CLUSTER`/`pg_repack`).
+- **SQL/PGQ** : requêtes de graphes de propriétés dans le SQL standard.
+- **JIT désactivé par défaut**.
+- **Maintenance** : releases 18.6, 17.11, 16.15, 15.19, 14.24 corrigeant 28 vulnérabilités. **PostgreSQL 14 atteint sa fin de vie le 12 novembre 2026** : planifier la migration.
+
+## MySQL / Percona
+
+- ⚠️ MySQL en est à la série 9.7 ; Percona discute (août 2026) d'une option de moteur de stockage DuckDB pour MySQL, signe de la convergence OLTP/analytique.
+
+## MongoDB
+
+- ⚠️ MongoDB 8.3 (mai 2026 chez Alibaba Cloud) : agrégation étendue, gestion du sharding retravaillée, journal des requêtes lentes en direct, suivi mémoire par requête. Percona propose un Technical Preview de son build 8.3 (juillet 2026), non destiné à la production.
+
+## Redis
+
+- Redis 8 intègre Search, JSON, TimeSeries et filtres de Bloom dans le cœur de la distribution.
+- ⚠️ Pré-versions 8.8 : limitation de débit native GCRA et nouveautés Streams.
+
+## Tendances à retenir
+
+1. Le planificateur devient pilotable et observable (`pg_plan_advice`, AQE) : moins de régressions de plan en production.
+2. L'I/O asynchrone se généralise et se règle automatiquement.
+3. Convergence OLTP/OLAP : DuckDB s'invite dans l'écosystème MySQL et PostgreSQL.
+4. Les modules (recherche, JSON, séries temporelles) migrent dans le cœur des moteurs NoSQL.
+5. Action immédiate : migrer hors de PostgreSQL 14 avant le 12 novembre.
+
+---
+
 # 2026-10-19 — Actualité technique des bases de données
 
 > Sources secondaires (blogs, agrégateurs) : à recouper avec les release notes officielles avant toute décision. Les points incertains sont signalés.
