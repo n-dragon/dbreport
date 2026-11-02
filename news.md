@@ -1,3 +1,31 @@
+# Actualité technique des bases de données — 2026-11-02
+
+## PostgreSQL 19 : sur la dernière ligne droite
+
+- **Calendrier** : RC 1 publiée ; RC 2 prévue le 12 nov. 2026, disponibilité générale (GA) prévue le **19 nov. 2026** sauf bug bloquant. Les correctifs de la grosse mise à jour mineure du 12 nov. ont été intégrés en amont dans la 19.
+- **Beta 1 (4 juin 2026)** : poursuite du sous-système d'I/O asynchrone introduit en PG 18 ; activation de la réplication logique sans redémarrage du serveur.
+- **Beta 4 (24 sept. 2026)** : le support SQL/PGQ (requêtes sur graphes de propriétés) a été retiré de la 19 pour laisser plus de temps à la relecture, avec d'autres fonctionnalités reportées.
+- Notes de version : <https://www.postgresql.org/docs/19/release-19.html>
+
+## Autres pistes (à confirmer, sources secondaires)
+
+- **DuckDB** : v1.5.6 (correctif) ; une v2.0.0 serait annoncée pour octobre — non vérifié sur le site officiel.
+- **MySQL** : dernière version mentionnée 9.7.1 (juin 2026) ; le type natif `VECTOR` reste moins mature que `pgvector`.
+- **Oracle** : Oracle Database 26ai (recherche vectorielle intégrée) disponible sur Amazon RDS depuis le 7 juil. 2026.
+- **pgvector** : aucune nouvelle version repérée.
+
+## À retenir pour un DBA
+
+1. Planifier des tests de montée de version vers PG 19 dès la RC (I/O asynchrone : surveiller les profils de latence).
+2. Ne pas compter sur SQL/PGQ en 19.
+3. La recherche vectorielle se banalise dans les moteurs généralistes (Oracle 26ai, MySQL, pgvector).
+
+*Limite : recherche web restreinte, résultats partiels ; les dates marquées « à confirmer » doivent être vérifiées.*
+
+Sources : [PG 19 Beta 1](https://www.postgresql.org/about/news/postgresql-19-beta-1-released-3313/) · [PG 19 Beta 4](https://www.postgresql.org/about/news/postgresql-19-beta-4-3386/) · [PG 19 RC 1](https://www.postgresql.org/about/news/postgresql-19-rc-1-released-3409/)
+
+---
+
 # Actualité technique des bases de données — 2026-10-26
 
 > Sources : recherches web du 2026-10-26 (notes de version PostgreSQL, Percona, Alibaba Cloud, presse spécialisée). Les éléments marqués ⚠️ proviennent de sources secondaires et sont à vérifier dans les notes de version officielles.
