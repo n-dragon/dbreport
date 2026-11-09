@@ -1,3 +1,37 @@
+# Actualité technique des bases de données — 2026-11-09
+
+## PostgreSQL 19 : RC 2 jeudi, GA prévue le 19 nov.
+
+- **Calendrier** : RC 1 publiée ; RC 2 prévue le **12 nov. 2026**, GA le **19 nov. 2026** sauf bug bloquant. La GA a glissé par rapport à l'objectif initial (fin octobre) à cause du volume de rapports de bugs en bêta (source secondaire).
+- **Fonctionnalités à retenir** :
+  - `REPACK [CONCURRENTLY]` : remplaçant en ligne de `VACUUM FULL`/`CLUSTER`.
+  - Autovacuum parallèle (`autovacuum_max_parallel_workers`).
+  - `WAIT FOR LSN` : lecture de ses propres écritures sur les réplicas.
+  - Réplication logique des séquences (utile pour les montées de version en ligne).
+  - SQL : `GROUP BY ALL`, `ON CONFLICT DO SELECT`.
+  - Sécurité : support serveur de SNI.
+  - `pg_plan_advice` : contrôle des décisions du planificateur.
+- ⚠️ **SQL/PGQ** : déjà signalé comme retiré en Beta 4 ; certaines sources le décrivent encore dans la 19. Se fier aux notes de version officielles.
+
+## Autres moteurs (sources secondaires, à vérifier)
+
+- **MySQL** : versions d'octobre 2026 annoncées par Oracle : 26.10 (Innovation), plus 9.7.4 et 8.4.13 (LTS). Corrige l'info « 9.7.1 » du rapport précédent.
+- **MariaDB** : 13 annoncée stable en septembre, avec un moteur de stockage intégrant DuckDB pour l'analytique ; 11.4.13 (maintenance) le 24 août.
+- **DuckDB** : v2.0 en alpha en septembre, publication finale non confirmée ; le CLI v2.0 aurait un « mode agent » réduisant les tokens lus par les agents LLM.
+- **SQLite** : correctif mineur sur les CTE récursives ; une étude suggère SQLite + extensions pour la recherche hybride (lexicale + sémantique) sans base vectorielle dédiée.
+
+## À retenir pour un DBA
+
+1. Tester PG 19 sur RC 2 ; prévoir `REPACK` à la place de `pg_repack`/`VACUUM FULL`.
+2. Évaluer l'autovacuum parallèle sur les grosses tables à forte rotation.
+3. MariaDB + DuckDB : à surveiller pour de l'analytique sans ETL.
+
+*Limite : recherche web partielle ; éléments ⚠️ à confirmer.*
+
+Sources : [PG 19 RC 1](https://www.postgresql.org/about/news/postgresql-19-rc-1-released-3409/) · [PG 19 Beta 1](https://www.postgresql.org/about/news/postgresql-19-beta-1-released-3313/) · [Neon PG19](https://neon.com/postgresql/postgresql-19-new-features) · [MySQL octobre 2026](https://blogs.oracle.com/mysql/?p=5419) · [MariaDB 13](https://alternativeto.net/news/2026/9/mariadb-13-stable-brings-improved-sql-compatibility-innodb-features-and-duckdb-integration/) · [DuckDB newsletter sept.](https://motherduck.com/blog/duckdb-ecosystem-newsletter-september-2026/)
+
+---
+
 # Actualité technique des bases de données — 2026-11-02
 
 ## PostgreSQL 19 : sur la dernière ligne droite
